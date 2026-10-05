@@ -615,6 +615,14 @@
             </div>
             <div class="hint">Saisie manuelle (pas de calcul automatique).</div>
           </div>
+          <div class="field">
+            <label for="achat_travaux">Travaux (rénovation, aménagement)</label>
+            <div class="input-suffix">
+              <input type="text" id="achat_travaux" data-xpf inputmode="numeric" placeholder="0" value="0">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">S'ajoute à l'investissement initial. Défaut 0 XPF.</div>
+          </div>
         </div>
         <div class="doc-note">Notaire NC ancien ≈11 % du prix (droits ~9,32 % + émoluments) → 1 650 000 XPF pour 15 000 000.</div>
       </div>
@@ -840,6 +848,7 @@
     bien_surface_annexes: "0",
     bien_prix_fai: 15000000,
     achat_frais_notaire: 1650000,
+    achat_travaux: 0,
     fin_apport: 2250000,
     fin_montant_emprunte: 14350000,
     fin_duree: "20",
@@ -1316,6 +1325,7 @@
         courtier: valXPF("fin_frais_courtier")
       },
       fraisNotaire: valXPF("achat_frais_notaire"),
+      travaux: valXPF("achat_travaux"),
       rentMonthly: valXPF("rec_loyer"),
       indexationPct: valNum("rec_indexation"),
       chargesLocativesMonthly: valXPF("rec_charges_locatives"),
@@ -1714,7 +1724,8 @@
 
       var fees = (p && p.fees) || {};
       var initialInvest = ((p && p.apport) || 0) + ((p && p.fraisNotaire) || 0) +
-        (fees.dossier || 0) + (fees.garantie || 0) + (fees.courtier || 0);
+        (fees.dossier || 0) + (fees.garantie || 0) + (fees.courtier || 0) +
+        ((p && p.travaux) || 0);
 
       return {
         holdingYears: N,
@@ -2753,7 +2764,8 @@
       ["Frais de dossier", formatXPF(p.fees.dossier)],
       ["Frais de garantie", formatXPF(p.fees.garantie)],
       ["Frais de courtier", formatXPF(p.fees.courtier)],
-      ["Frais de notaire", formatXPF(p.fraisNotaire)]
+      ["Frais de notaire", formatXPF(p.fraisNotaire)],
+      ["Travaux", formatXPF(p.travaux || 0)]
     ];
     for (var hi2 = 0; hi2 < hyp2.length; hi2++) {
       h += '<div class="hl"><span class="k">' + escXml(hyp2[hi2][0]) + '</span><span class="v">' + escXml(hyp2[hi2][1]) + "</span></div>";

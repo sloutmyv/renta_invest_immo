@@ -2,6 +2,8 @@
 
 Simulateur d'investissement locatif **100 % autonome** (un seul fichier `index.html`, aucune dépendance) — devise **XPF**, contexte Nouvelle-Calédonie.
 
+**Version 1.1** (05/10/2026) : ajout du champ **Travaux** (rénovation/aménagement) dans « Frais achat » — défaut **0 XPF**, s'ajoute à l'investissement initial et se répercute sur l'argent investi, TRI et multiple.
+
 ## Ouverture
 
 Ouvrir `index.html` dans un navigateur — c'est tout. Les saisies sont sauvegardées automatiquement en localStorage.
