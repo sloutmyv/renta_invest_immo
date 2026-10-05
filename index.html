@@ -1,4 +1,4 @@
-Ca fai<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -351,6 +351,34 @@ Ca fai<!DOCTYPE html>
     .fiche-card .fl { font-size: 8px; color: #555; }
     .fiche-card .fv { font-size: 11px; font-weight: 700; }
     .fiche-line { margin: 1px 0; }
+    .fiche-hyp {
+      display: flex;
+      gap: 10px;
+      margin: 3px 0 6px;
+    }
+    .fiche-hyp > div {
+      flex: 1;
+      border: 0.5px solid #bbb;
+      padding: 3px 5px;
+      background: #fafafa;
+    }
+    .fiche-hyp h3 {
+      margin: 0 0 2px;
+      font-size: 8.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 0.5px solid #ccc;
+      padding-bottom: 1px;
+    }
+    .fiche-hyp .hl {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 8px;
+      line-height: 1.5;
+    }
+    .fiche-hyp .hl .k { color: #555; }
+    .fiche-hyp .hl .v { font-weight: 600; text-align: right; }
     table.fiche-table {
       width: 100%;
       border-collapse: collapse;
@@ -2691,6 +2719,74 @@ Ca fai<!DOCTYPE html>
         escXml(kpis[k][1]) + "</div></div>";
     }
     h += "</div>";
+
+    /* --- hypothèses de la simulation (toutes les valeurs saisies) --- */
+    h += '<div class="fiche-h2">Hypothèses de la simulation</div>';
+    h += '<div class="fiche-hyp">';
+    /* Colonne 1 : Bien */
+    h += '<div><h3>Bien</h3>';
+    var hyp1 = [
+      ["Adresse / description", val("bien_adresse") || "—"],
+      ["Type", val("bien_type")],
+      ["Année de construction", val("bien_annee") || "—"],
+      ["Surface habitable", (parseFloat(val("bien_surface_habitable")) || 0) + " m²"],
+      ["Surface annexes", (parseFloat(val("bien_surface_annexes")) || 0) + " m²"],
+      ["Prix d'achat FAI", formatXPF(p.priceFAI)],
+      ["Prix au m²", (p.prixM2 != null ? formatXPF(p.prixM2) + "/m²" : "—")]
+    ];
+    for (var hi = 0; hi < hyp1.length; hi++) {
+      h += '<div class="hl"><span class="k">' + escXml(hyp1[hi][0]) + '</span><span class="v">' + escXml(hyp1[hi][1]) + "</span></div>";
+    }
+    h += "</div>";
+
+    /* Colonne 2 : Financement + frais achat */
+    h += '<div><h3>Financement</h3>';
+    var assur = p.insuranceMode === "forfait"
+      ? "forfait " + formatXPF(p.insuranceForfaitMonthly) + "/mois"
+      : p.insuranceRatePct + " % du capital/an";
+    var hyp2 = [
+      ["Apport", formatXPF(p.apport)],
+      ["Montant emprunté", formatXPF(p.capital)],
+      ["Durée du crédit", p.years + " ans"],
+      ["Taux nominal", p.annualRatePct + " %/an"],
+      ["Assurance de prêt", assur],
+      ["Frais de dossier", formatXPF(p.fees.dossier)],
+      ["Frais de garantie", formatXPF(p.fees.garantie)],
+      ["Frais de courtier", formatXPF(p.fees.courtier)],
+      ["Frais de notaire", formatXPF(p.fraisNotaire)]
+    ];
+    for (var hi2 = 0; hi2 < hyp2.length; hi2++) {
+      h += '<div class="hl"><span class="k">' + escXml(hyp2[hi2][0]) + '</span><span class="v">' + escXml(hyp2[hi2][1]) + "</span></div>";
+    }
+    h += "</div>";
+
+    /* Colonne 3 : Recettes / charges / fiscalité / revente */
+    h += '<div><h3>Exploitation & revente</h3>';
+    var prixRev = rp.modePrix === "montant"
+      ? "montant saisi (" + formatXPF(rp.prixMontant) + ")"
+      : rp.modePrix === "pourcentage"
+        ? rp.evolutionPct + " %/an sur prix FAI"
+        : "prix d'achat FAI";
+    var hyp3 = [
+      ["Loyer mensuel HC", formatXPF(p.rentMonthly)],
+      ["Indexation loyer", p.indexationPct + " %/an"],
+      ["Charges locatives", formatXPF(p.chargesLocativesMonthly) + "/mois"],
+      ["Vacance locative", p.vacancyPct + " %"],
+      ["Gestion locative", p.gestionPct + " % du loyer"],
+      ["Charges copro", formatXPF(p.coproMonthly) + "/mois"],
+      ["Taxe foncière", formatXPF(p.taxeFonciereAnnual) + "/an"],
+      ["Assurance PNO", formatXPF(p.pnoAnnual) + "/an"],
+      ["Entretien / travaux", p.entretienPct + " % du loyer"],
+      ["Taux imposition locatif", p.taxRatePct + " %"],
+      ["Durée de détention", rp.holdingYears + " ans"],
+      ["Mode prix de revente", prixRev],
+      ["Frais de vente agence", rp.fraisVentePct + " %"],
+      ["Taux imposition PV", rp.taxPVPct + " %"]
+    ];
+    for (var hi3 = 0; hi3 < hyp3.length; hi3++) {
+      h += '<div class="hl"><span class="k">' + escXml(hyp3[hi3][0]) + '</span><span class="v">' + escXml(hyp3[hi3][1]) + "</span></div>";
+    }
+    h += "</div></div>";
 
     /* --- scénario de revente --- */
     h += '<div class="fiche-h2">Scénario de revente — fin d\'année ' + res.holdingYears + '</div>';
