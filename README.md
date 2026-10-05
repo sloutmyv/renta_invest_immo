@@ -1,0 +1,36 @@
+# Renta Invest Immo
+
+Simulateur d'investissement locatif **100 % autonome** (un seul fichier `index.html`, aucune dépendance) — devise **XPF**, contexte Nouvelle-Calédonie.
+
+## Ouverture
+
+Ouvrir `index.html` dans un navigateur — c'est tout. Les saisies sont sauvegardées automatiquement en localStorage.
+
+## Fonctionnalités
+
+| Bloc | Fonction |
+|---|---|
+| 1 | Saisie complète (bien, financement, frais achat, recettes, charges, fiscalité, revente) + défauts NC préremplis |
+| 2 | Moteur de calcul (crédit annuité constante, exploitation annuelle, fiscalité simple) + tableau de bord KPI |
+| 3 | Scénario de revente (3 modes : prix d'achat / montant saisi / % évolution), TRI (dichotomie), multiple d'argent investi |
+| 4 | 3 visuels SVG maison : amortissement, locataire vs reste à charge, profil TRI/multiple selon la durée (1-30 ans) |
+| 5 | Fiche PDF imprimable (A4) : indicateurs, scénario de revente, graphiques 1-2, tableau annuel condensé 30 ans |
+
+Spécificités : horizon 30 ans (dépasse la fin du crédit), colonnes « argent investi cumulé », « cash si revente chaque année », « gain/perte total si revente », « multiple par année ».
+
+## Tests
+
+Console du navigateur avec `?debug.test` en suffixe d'URL : cas de test bloc 2 (T2 33 M) et bloc 3 (revente 15 ans, +1 %/an) s'affichent automatiquement.
+
+Modules exposés en console : `RentaInvestBloc2` à `RentaInvestBloc5`.
+
+## Docs
+
+- `docs/PROPOSITION.md` / `CAHIER-DES-CHARGES.md` : spécification V1 validée
+- `docs/CALCULS.md` : formules de référence (maille crédit / exploitation / revente / TRI)
+- `docs/PLAN.md` : plan d'implémentation par blocs
+- `docs/models-preferences.md` : choix IA (GLM - Flash via opencode)
+
+## Licence
+
+Usage privé — pas de licence explicite.

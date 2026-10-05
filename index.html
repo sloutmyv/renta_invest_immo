@@ -1,0 +1,2808 @@
+Ca fai<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renta Invest Immo</title>
+<style>
+  :root {
+    --bg: #1c1f24;
+    --bg-panel: #23272e;
+    --bg-input: #2b3038;
+    --border: #3a4048;
+    --text: #e6e8eb;
+    --text-dim: #9aa2ad;
+    --accent: #4f9cf9;
+    --accent-dim: #2f6bb0;
+    --danger: #e06c75;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  header {
+    background: linear-gradient(180deg, #262b33, #20242b);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 20px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+  }
+  header .subtitle {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  button {
+    font-family: inherit;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text);
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  button.danger { color: var(--danger); }
+  button.danger:hover { border-color: var(--danger); }
+
+  details.section {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  details.section > summary {
+    cursor: pointer;
+    padding: 13px 16px;
+    font-weight: 600;
+    font-size: 15px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  details.section > summary::-webkit-details-marker { display: none; }
+  details.section > summary::after {
+    content: "\25B8";
+    color: var(--text-dim);
+    transition: transform 0.15s ease;
+    font-size: 13px;
+  }
+  details.section[open] > summary::after { transform: rotate(90deg); }
+  details.section > summary:hover { background: #282d35; }
+  .section-body {
+    padding: 4px 16px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px 18px;
+    margin-top: 14px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .field .hint {
+    font-size: 11px;
+    color: #737b86;
+  }
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(79, 156, 249, 0.18);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .input-suffix { position: relative; }
+  .input-suffix input { padding-right: 46px; }
+  .input-suffix .suffix {
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+  .toggle {
+    display: inline-flex;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .toggle label {
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+  .toggle input:checked + span { color: var(--text); }
+  .toggle label:has(input:checked) {
+    background: var(--accent-dim);
+    color: #fff;
+  }
+  .field.hidden { display: none; }
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    padding: 24px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .calc-preview {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .doc-note {
+    font-size: 11px;
+    color: #737b86;
+    font-style: italic;
+    line-height: 1.4;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+
+  /* ---------- Bloc 2 : tableau de bord ---------- */
+  .dashboard { margin-bottom: 22px; }
+  .dashboard > h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .dash-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .card .card-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .card .card-value {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .card .card-sub {
+    font-size: 11px;
+    color: #737b86;
+    margin-top: 4px;
+  }
+  .card.accent .card-value { color: var(--accent); }
+  .card.positive .card-value { color: #7ec699; }
+  .card.negative .card-value { color: var(--danger); }
+  .annual-wrap { margin-top: 22px; }
+  .annual-wrap > h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  table.annual {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+  }
+  table.annual td { white-space: nowrap; }
+  table.annual th { white-space: normal; }
+  table.annual th,
+  table.annual td {
+    padding: 4px 6px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  table.annual th:first-child,
+  table.annual td:first-child { text-align: left; }
+  table.annual thead th {
+    background: #262b33;
+    color: var(--text-dim);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  table.annual tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+  table.annual tbody tr:hover { background: rgba(79, 156, 249, 0.08); }
+  table.annual tbody tr.total-row { font-weight: 600; background: #282d35; }
+  table.annual td.neg { color: var(--danger); }
+  table.annual td.pos { color: #7ec699; }
+  .dash-empty {
+    color: var(--text-dim);
+    font-size: 13px;
+    padding: 10px 2px;
+  }
+
+  /* ---------- Bloc 3 : revente / TRI ---------- */
+  .card.accent-soft .card-value { color: #e5c07b; }
+  table.annual tbody tr.row-revente {
+    background: rgba(79, 156, 249, 0.12);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  table.annual tbody tr.row-revente:hover { background: rgba(79, 156, 249, 0.2); }
+
+  /* ---------- Bloc 4 : visuels SVG ---------- */
+  .chart-section { margin-bottom: 22px; }
+  .chart-section > h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .chart-block {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 12px;
+  }
+  .chart-block > h3 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+  }
+  .chart-svg { width: 100%; height: auto; display: block; }
+  .chart-empty {
+    color: var(--text-dim);
+    font-size: 13px;
+    padding: 8px 2px;
+  }
+
+  /* ---------- Bloc 5 : fiche PDF (@media print) ---------- */
+  #fiche { display: none; }
+  #btn-pdf { color: #7ec699; font-weight: 600; }
+  #btn-pdf:hover { border-color: #7ec699; }
+  @media print {
+    @page { size: A4 portrait; margin: 10mm; }
+    html, body {
+      background: #fff !important;
+      color: #111 !important;
+      font-size: 10px;
+    }
+    header, .dashboard, .chart-section, .toolbar, #form-saisie, footer {
+      display: none !important;
+    }
+    #fiche {
+      display: block !important;
+      color: #111;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    .fiche-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 2px;
+    }
+    .fiche-sub { color: #444; font-size: 10px; margin-bottom: 6px; }
+    .fiche-h2 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #999;
+      margin: 10px 0 4px;
+      padding-bottom: 2px;
+    }
+    .fiche-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      margin-bottom: 4px;
+    }
+    .fiche-card { min-width: 130px; }
+    .fiche-card .fl { font-size: 8px; color: #555; }
+    .fiche-card .fv { font-size: 11px; font-weight: 700; }
+    .fiche-line { margin: 1px 0; }
+    table.fiche-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 7.8px;
+    }
+    table.fiche-table th, table.fiche-table td {
+      border: 0.5px solid #bbb;
+      padding: 1.5px 3px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    table.fiche-table th { background: #eee; font-weight: 700; }
+    table.fiche-table th:first-child, table.fiche-table td:first-child { text-align: left; }
+    table.fiche-table tr.total-row { font-weight: 700; background: #f2f2f2; }
+    .fiche-svg-wrap { margin: 2px 0 6px; }
+    .fiche-svg-wrap svg { width: 100%; height: auto; }
+    .fiche-ref {
+      margin-top: 8px;
+      padding: 5px 6px;
+      border: 0.5px solid #bbb;
+      background: #fafafa;
+      font-size: 9px;
+      white-space: pre-wrap;
+    }
+    tr.row-revente td { background: #eef3fb !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Renta Invest Immo</h1>
+  <div class="subtitle">Simulateur d'investissement locatif &mdash; devise XPF</div>
+</header>
+
+<main>
+  <!-- ============ BLOC 2 : TABLEAU DE BORD ============ -->
+  <section class="dashboard" id="dashboard" aria-live="polite">
+    <h2>Tableau de bord</h2>
+    <div class="dash-cards" id="dash-cards"></div>
+    <div class="annual-wrap">
+      <h3>Tableau annuel &mdash; crédit &amp; exploitation</h3>
+      <div class="table-scroll">
+        <table class="annual" id="annual-table">
+          <thead>
+            <tr>
+              <th>Année</th>
+              <th>Capital (k XPF)</th>
+              <th>Intérêts</th>
+              <th>Assurance</th>
+              <th>Recettes</th>
+              <th>Charges</th>
+              <th>Impôt</th>
+              <th>Cash-flow</th>
+              <th>Capital restant</th>
+              <th>Investi (k XPF)</th>
+              <th>Cash revente</th>
+              <th>Gain / perte</th>
+              <th>Multiple</th>
+            </tr>
+          </thead>
+          <tbody id="annual-body"></tbody>
+        </table>
+      </div>
+      <div class="calc-preview" id="dash-footnote">Le tableau se recalcule à chaque modification de la saisie. Scénario de revente &amp; TRI&nbsp;: bloc&nbsp;3.</div>
+    </div>
+  </section>
+
+  <!-- ============ BLOC 4 : VISUELS SVG ============ -->
+  <section class="chart-section" id="charts">
+    <h2>Visuels</h2>
+    <div class="chart-block" id="chart1-block">
+      <h3>Amortissement annuel &mdash; capital / int&eacute;r&ecirc;ts / assurance + capital restant d&ucirc;</h3>
+      <div id="chart1"><div class="chart-empty">Calcul en cours&hellip;</div></div>
+    </div>
+    <div class="chart-block" id="chart2-block">
+      <h3>Qui paie quoi &mdash; locataire vs reste &agrave; charge (annuel + cumul&eacute;)</h3>
+      <div id="chart2"><div class="chart-empty">Calcul en cours&hellip;</div></div>
+    </div>
+    <div class="chart-block" id="chart3-block">
+      <h3>Profil du TRI & du multiple selon la dur&eacute;e de d&eacute;tention</h3>
+      <div id="chart3"><div class="chart-empty">Calcul en cours&hellip;</div></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <button type="button" id="btn-pdf">Exporter fiche PDF</button>
+    <button type="button" id="btn-effacer" class="danger">Effacer</button>
+  </div>
+  <div id="fiche"></div>
+
+  <form id="form-saisie" autocomplete="off">
+
+    <!-- ============ BIEN ============ -->
+    <details class="section" id="section-bien" open>
+      <summary>Bien</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="bien_adresse">Adresse / description</label>
+            <input type="text" id="bien_adresse" placeholder="Ex : T2 Nouméa, rue ...">
+          </div>
+          <div class="field">
+            <label for="bien_type">Type de bien</label>
+            <select id="bien_type">
+              <option value="T1">T1</option>
+              <option value="T2" selected>T2</option>
+              <option value="T3">T3</option>
+              <option value="T4">T4</option>
+              <option value="Maison">Maison</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bien_annee">Année de construction</label>
+            <input type="number" id="bien_annee" min="1800" max="2100" step="1" placeholder="Ex : 2015" value="2010">
+          </div>
+          <div class="field">
+            <label for="bien_surface_habitable">Surface habitable</label>
+            <div class="input-suffix">
+              <input type="number" id="bien_surface_habitable" min="0" step="0.1" placeholder="0" value="60">
+              <span class="suffix">m&sup2;</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bien_surface_annexes">Surface annexes</label>
+            <div class="input-suffix">
+              <input type="number" id="bien_surface_annexes" min="0" step="0.1" placeholder="0" value="0">
+              <span class="suffix">m&sup2;</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bien_prix_fai">Prix d'achat FAI</label>
+            <div class="input-suffix">
+              <input type="text" id="bien_prix_fai" data-xpf inputmode="numeric" placeholder="0" value="15 000 000">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="calc-preview" id="preview_prix_m2">Prix au m&sup2; : &mdash;</div>
+          </div>
+        </div>
+        <div class="doc-note">Défauts NC : T2 Nouméa construit en 2010, 60 m², prix FAI 15 000 000 XPF (≈250 000 XPF/m²).</div>
+      </div>
+    </details>
+
+    <!-- ============ FINANCEMENT ============ -->
+    <details class="section" id="section-financement">
+      <summary>Financement</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="fin_apport">Apport</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_apport" data-xpf inputmode="numeric" placeholder="0" value="2 250 000">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fin_montant_emprunte">Montant emprunté</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_montant_emprunte" data-xpf inputmode="numeric" placeholder="0" value="14 350 000">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">Champ explicite : à toi de décider si la banque finance les frais.</div>
+          </div>
+          <div class="field">
+            <label for="fin_duree">Durée du crédit</label>
+            <div class="input-suffix">
+              <input type="number" id="fin_duree" min="0" max="40" step="1" placeholder="20" value="20">
+              <span class="suffix">ans</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fin_taux">Taux annuel</label>
+            <div class="input-suffix">
+              <input type="number" id="fin_taux" min="0" step="0.01" placeholder="3.5" value="3.5">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Assurance de prêt</label>
+            <div class="toggle">
+              <label><input type="radio" name="fin_assurance_mode" value="pct" checked><span>% capital / an</span></label>
+              <label><input type="radio" name="fin_assurance_mode" value="forfait"><span>Forfait mensuel</span></label>
+            </div>
+          </div>
+          <div class="field" id="field_assurance_pct">
+            <label for="fin_assurance_taux">Assurance de prêt (% capital/an)</label>
+            <div class="input-suffix">
+              <input type="number" id="fin_assurance_taux" min="0" step="0.01" placeholder="0.30" value="0.36">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+          <div class="field hidden" id="field_assurance_forfait">
+            <label for="fin_assurance_forfait">Assurance de prêt (forfait)</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_assurance_forfait" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF/mois</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fin_frais_dossier">Frais de dossier</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_frais_dossier" data-xpf inputmode="numeric" placeholder="0" value="30 000">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fin_frais_garantie">Frais de garantie</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_frais_garantie" data-xpf inputmode="numeric" placeholder="0" value="50 000">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fin_frais_courtier">Frais de courtier</label>
+            <div class="input-suffix">
+              <input type="text" id="fin_frais_courtier" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+        </div>
+        <div class="doc-note">Défauts NC : apport 15 % (2 250 000), emprunt 14 350 000 = prix 15 M + notaire 1,65 M − apport 2,25 M − 50 000 (garantie), 20 ans à 3,5 %, assurance prêt 0,36 %/an du capital.</div>
+      </div>
+    </details>
+
+    <!-- ============ FRAIS ACHAT ============ -->
+    <details class="section" id="section-frais-achat">
+      <summary>Frais achat</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="achat_frais_notaire">Frais de notaire</label>
+            <div class="input-suffix">
+              <input type="text" id="achat_frais_notaire" data-xpf inputmode="numeric" placeholder="0" value="1 650 000">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">Saisie manuelle (pas de calcul automatique).</div>
+          </div>
+        </div>
+        <div class="doc-note">Notaire NC ancien ≈11 % du prix (droits ~9,32 % + émoluments) → 1 650 000 XPF pour 15 000 000.</div>
+      </div>
+    </details>
+
+    <!-- ============ RECETTES ============ -->
+    <details class="section" id="section-recettes">
+      <summary>Recettes</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="rec_loyer">Loyer mensuel hors charges</label>
+            <div class="input-suffix">
+              <input type="text" id="rec_loyer" data-xpf inputmode="numeric" placeholder="0" value="100 000">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rec_indexation">Indexation loyer</label>
+            <div class="input-suffix">
+              <input type="number" id="rec_indexation" min="0" step="0.1" value="0">
+              <span class="suffix">%/an</span>
+            </div>
+            <div class="hint">Seuls les loyers sont indexés, pas les charges.</div>
+          </div>
+          <div class="field">
+            <label for="rec_charges_locatives">Charges locatives mensuelles</label>
+            <div class="input-suffix">
+              <input type="text" id="rec_charges_locatives" data-xpf inputmode="numeric" placeholder="0" value="5 000">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rec_vacance">Vacance locative</label>
+            <div class="input-suffix">
+              <input type="number" id="rec_vacance" min="0" max="100" step="0.1" value="5">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rec_gestion">Gestion locative</label>
+            <div class="input-suffix">
+              <input type="number" id="rec_gestion" min="0" max="100" step="0.1" value="0">
+              <span class="suffix">% loyer</span>
+            </div>
+          </div>
+        </div>
+        <div class="doc-note">Loyer type T2 Nouméa 100 000 XPF/mois, vacance 5 %, charges locatives 5 000 XPF/mois.</div>
+      </div>
+    </details>
+
+    <!-- ============ CHARGES PROPRIÉTAIRE ============ -->
+    <details class="section" id="section-charges-proprietaire">
+      <summary>Charges propriétaire</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="chg_copro">Charges copro mensuelles</label>
+            <div class="input-suffix">
+              <input type="text" id="chg_copro" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="chg_taxe_fonciere">Taxe foncière annuelle</label>
+            <div class="input-suffix">
+              <input type="text" id="chg_taxe_fonciere" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="chg_pno">Assurance PNO annuelle</label>
+            <div class="input-suffix">
+              <input type="text" id="chg_pno" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="chg_entretien">Entretien / travaux</label>
+            <div class="input-suffix">
+              <input type="number" id="chg_entretien" min="0" max="100" step="0.1" value="5">
+              <span class="suffix">% loyer</span>
+            </div>
+          </div>
+        </div>
+        <div class="doc-note">Charges NC : copro 8 000/mois, taxe foncière 45 000/an (contribution foncière NC ≈8,4 % sur la valeur cadastrale construction), PNO 35 000/an, entretien 5 %.</div>
+      </div>
+    </details>
+
+    <!-- ============ FISCALITÉ ============ -->
+    <details class="section" id="section-fiscalite">
+      <summary>Fiscalité</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="fisc_taux">Taux d'imposition résultat locatif</label>
+            <div class="input-suffix">
+              <input type="number" id="fisc_taux" min="0" max="100" step="0.1" value="25">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Taux simple appliqué au résultat annuel (0 par défaut).</div>
+          </div>
+        </div>
+        <div class="doc-note">Taux indicatif NC 25 % appliqué au résultat locatif (taux simple, sans barème complet).</div>
+      </div>
+    </details>
+
+    <!-- ============ SCÉNARIO DE REVENTE ============ -->
+    <details class="section" id="section-revente">
+      <summary>Scénario de revente</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="rev_duree_detention">Durée de détention</label>
+            <div class="input-suffix">
+              <input type="number" id="rev_duree_detention" min="0" step="1" placeholder="10" value="15">
+              <span class="suffix">ans</span>
+            </div>
+            <div class="hint">De 1 à 30 ans ; après la fin du crédit, le CR est soldé (0).</div>
+          </div>
+          <div class="field">
+            <label for="rev_mode_prix">Mode prix de revente</label>
+            <select id="rev_mode_prix">
+              <option value="achat" selected>Prix d'achat FAI (revente sans plus-value)</option>
+              <option value="montant">Montant saisi (XPF)</option>
+              <option value="pourcentage">% évolution annuelle sur prix FAI</option>
+            </select>
+          </div>
+          <div class="field" id="field_rev_montant">
+            <label for="rev_prix_montant">Prix de revente</label>
+            <div class="input-suffix">
+              <input type="text" id="rev_prix_montant" data-xpf inputmode="numeric" placeholder="0">
+              <span class="suffix">XPF</span>
+            </div>
+          </div>
+          <div class="field hidden" id="field_rev_evolution">
+            <label for="rev_evolution">Évolution annuelle du marché</label>
+            <div class="input-suffix">
+              <input type="number" id="rev_evolution" step="0.1" placeholder="1" value="1">
+              <span class="suffix">%/an</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rev_frais_vente">Frais de vente agence</label>
+            <div class="input-suffix">
+              <input type="number" id="rev_frais_vente" min="0" max="100" step="0.1" value="4">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rev_taux_plus_value">Taux d'imposition plus-value</label>
+            <div class="input-suffix">
+              <input type="number" id="rev_taux_plus_value" min="0" max="100" step="0.1" value="0">
+              <span class="suffix">%</span>
+            </div>
+          </div>
+        </div>
+        <div class="doc-note">Scénario NC : détention 15 ans, marché +1 %/an, frais d'agence 4 %, plus-value 0 % (exonération indicielle simplifiée).</div>
+      </div>
+    </details>
+
+    <!-- ============ RÉFÉRENCE / COMMENTAIRE (fiche PDF) ============ -->
+    <details class="section" id="section-reference">
+      <summary>Référence option / commentaire</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="ref_commentaire">Référence de l'option / commentaire de la fiche</label>
+            <textarea id="ref_commentaire" placeholder="Référence, version du dossier ou commentaire destiné à la fiche PDF..."></textarea>
+          </div>
+        </div>
+      </div>
+    </details>
+
+  </form>
+</main>
+
+<footer>
+  Renta Invest Immo &mdash; bloc 1 : saisie & sauvegarde locale &middot; bloc 2 : moteur de calcul & tableau de bord &middot; bloc 3 : revente/TRI &middot; bloc 4 : visuels SVG &middot; bloc 5 : fiche PDF.
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "renta_invest_immo_v2";
+  var form = document.getElementById("form-saisie");
+
+  /* ---------- Formatage XPF : séparateur milliers = espace, pas de centimes ---------- */
+  function formatXPF(raw) {
+    var digits = String(raw == null ? "" : raw).replace(/[^0-9]/g, "");
+    if (digits === "") return "";
+    digits = digits.replace(/^0+(?=\d)/, "");
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+
+  function parseXPF(value) {
+    var digits = String(value == null ? "" : value).replace(/[^0-9]/g, "");
+    return digits === "" ? 0 : parseInt(digits, 10);
+  }
+
+  function attachXPF(input) {
+    input.addEventListener("input", function () {
+      var caretAtEnd = input.selectionStart === input.value.length;
+      input.value = formatXPF(input.value);
+      if (caretAtEnd) {
+        input.selectionStart = input.selectionEnd = input.value.length;
+      }
+    });
+  }
+
+  var xpfInputs = form.querySelectorAll("[data-xpf]");
+  for (var i = 0; i < xpfInputs.length; i++) attachXPF(xpfInputs[i]);
+
+  /* ---------- Valeurs par défaut NC (préremplissage première visite) ----------
+   * Appliquées uniquement si localStorage est vide, et restaurées par le
+   * bouton Effacer. Champs XPF renseignés en nombre, formatés à l'affichage.
+   * Sources NC indiquées sous chaque groupe du formulaire. */
+  var DEFAULTS = {
+    bien_type: "T2",
+    bien_annee: "2010",
+    bien_surface_habitable: "60",
+    bien_surface_annexes: "0",
+    bien_prix_fai: 15000000,
+    achat_frais_notaire: 1650000,
+    fin_apport: 2250000,
+    fin_montant_emprunte: 14350000,
+    fin_duree: "20",
+    fin_taux: "3.5",
+    fin_assurance_taux: "0.36",
+    fin_frais_dossier: 30000,
+    fin_frais_garantie: 50000,
+    fin_frais_courtier: 0,
+    rec_loyer: 100000,
+    rec_indexation: "0",
+    rec_charges_locatives: 5000,
+    rec_vacance: "5",
+    rec_gestion: "0",
+    chg_copro: 8000,
+    chg_taxe_fonciere: 45000,
+    chg_pno: 35000,
+    chg_entretien: "5",
+    fisc_taux: "25",
+    rev_duree_detention: "15",
+    rev_mode_prix: "achat",
+    rev_evolution: "1",
+    rev_frais_vente: "4",
+    rev_taux_plus_value: "0"
+  };
+  var DEFAULT_ASSURANCE_MODE = "pct";
+
+  function applyDefaults() {
+    Object.keys(DEFAULTS).forEach(function (id) {
+      var node = document.getElementById(id);
+      if (!node) return;
+      var v = DEFAULTS[id];
+      node.value = node.hasAttribute("data-xpf") ? formatXPF(v) : String(v);
+    });
+    var radio = form.querySelector(
+      'input[name="fin_assurance_mode"][value="' + DEFAULT_ASSURANCE_MODE + '"]'
+    );
+    if (radio) radio.checked = true;
+  }
+
+  /* ---------- Prix au m² (affichage informatif, sans moteur de calcul) ---------- */
+  var prixInput = document.getElementById("bien_prix_fai");
+  var surfHab = document.getElementById("bien_surface_habitable");
+  var previewM2 = document.getElementById("preview_prix_m2");
+  function updatePrixM2() {
+    var prix = parseXPF(prixInput.value);
+    var surf = parseFloat(surfHab.value) || 0;
+    if (prix > 0 && surf > 0) {
+      previewM2.textContent = "Prix au m\u00B2 : " + formatXPF(Math.round(prix / surf)) + " XPF/m\u00B2";
+    } else {
+      previewM2.textContent = "Prix au m\u00B2 : \u2014";
+    }
+  }
+  prixInput.addEventListener("input", updatePrixM2);
+  surfHab.addEventListener("input", updatePrixM2);
+
+  /* ---------- Toggle assurance de prêt ---------- */
+  var assuranceRadios = form.querySelectorAll('input[name="fin_assurance_mode"]');
+  var fieldAssurancePct = document.getElementById("field_assurance_pct");
+  var fieldAssuranceForfait = document.getElementById("field_assurance_forfait");
+  function updateAssuranceMode() {
+    var mode = form.querySelector('input[name="fin_assurance_mode"]:checked').value;
+    fieldAssurancePct.classList.toggle("hidden", mode !== "pct");
+    fieldAssuranceForfait.classList.toggle("hidden", mode !== "forfait");
+  }
+  for (var j = 0; j < assuranceRadios.length; j++) {
+    assuranceRadios[j].addEventListener("change", updateAssuranceMode);
+  }
+
+  /* ---------- Toggle mode prix de revente ---------- */
+  var modePrix = document.getElementById("rev_mode_prix");
+  var fieldRevMontant = document.getElementById("field_rev_montant");
+  var fieldRevEvolution = document.getElementById("field_rev_evolution");
+  function updateModePrix() {
+    var montant = modePrix.value === "montant";
+    fieldRevMontant.classList.toggle("hidden", !montant);
+    fieldRevEvolution.classList.toggle("hidden", montant);
+  }
+  modePrix.addEventListener("change", updateModePrix);
+
+  /* ---------- Sauvegarde automatique localStorage ---------- */
+  function collectState() {
+    var state = { fields: {}, radios: {}, checks: {} };
+    var inputs = form.querySelectorAll("input, select, textarea");
+    for (var k = 0; k < inputs.length; k++) {
+      var el = inputs[k];
+      if (!el.id && el.type !== "radio") continue;
+      if (el.type === "radio") {
+        if (el.checked) state.radios[el.name] = el.value;
+      } else if (el.type === "checkbox") {
+        state.checks[el.id] = el.checked;
+      } else {
+        state.fields[el.id] = el.value;
+      }
+    }
+    return state;
+  }
+
+  var saveTimer = null;
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectState()));
+    } catch (e) { /* stockage indisponible : on ignore */ }
+  }
+  function scheduleSave() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveState, 250);
+  }
+
+  function restoreState() {
+    var raw;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var state;
+    try { state = JSON.parse(raw); } catch (e) { return; }
+    if (!state) return;
+
+    if (state.fields) {
+      Object.keys(state.fields).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (el.hasAttribute("data-xpf")) {
+          el.value = formatXPF(state.fields[id]);
+        } else {
+          el.value = state.fields[id];
+        }
+      });
+    }
+    if (state.radios) {
+      Object.keys(state.radios).forEach(function (name) {
+        var el = form.querySelector('input[name="' + name + '"][value="' + state.radios[name] + '"]');
+        if (el) el.checked = true;
+      });
+    }
+    if (state.checks) {
+      Object.keys(state.checks).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el && el.type === "checkbox") el.checked = state.checks[id];
+      });
+    }
+  }
+
+  form.addEventListener("input", scheduleSave);
+  form.addEventListener("change", scheduleSave);
+  form.addEventListener("submit", function (e) { e.preventDefault(); });
+
+  /* ---------- Bouton Effacer : reset + restauration des défauts + recalcul ---------- */
+  document.getElementById("btn-effacer").addEventListener("click", function () {
+    if (!confirm("Réinitialiser avec les valeurs par défaut NC et effacer la sauvegarde locale ?")) return;
+    form.reset();
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    applyDefaults();
+    updateAssuranceMode();
+    updateModePrix();
+    updatePrixM2();
+    /* form.reset() n'émet pas d'événement : on force le recalcul du tableau de bord. */
+    if (window.RentaInvestBloc2 && typeof window.RentaInvestBloc2.refresh === "function") {
+      window.RentaInvestBloc2.refresh();
+    }
+  });
+
+  /* ---------- Init ---------- */
+  function hasSavedState() {
+    try { return !!localStorage.getItem(STORAGE_KEY); } catch (e) { return false; }
+  }
+  var hadSavedState = hasSavedState();
+  restoreState();
+  if (!hadSavedState) applyDefaults();
+  updateAssuranceMode();
+  updateModePrix();
+  updatePrixM2();
+})();
+</script>
+
+<script>
+/* ================================================================
+ * Renta Invest Immo — BLOC 2 : moteur de calcul + tableau de bord
+ * ----------------------------------------------------------------
+ * Ajout isolé : ne modifie pas la structure de saisie (bloc 1).
+ * Lit le formulaire #form-saisie, recalcule à chaque modification et
+ * met à jour les cartes ainsi que le tableau annuel.
+ * Formules de référence : docs/CALCULS.md — devise XPF.
+ * Périmètre : crédit + exploitation uniquement. Pas de revente/TRI
+ * (bloc 3), pas de graphique, pas de CSS d'impression.
+ * ================================================================ */
+(function () {
+  "use strict";
+
+  var form = document.getElementById("form-saisie");
+  if (!form) return;
+
+  /* Horizon de simulation : 30 ans (dépasse la fin du crédit). */
+  var SIM_YEARS = 30;
+
+  /* ================================================================
+   * Utilitaires numériques et formatage
+   * ================================================================ */
+
+  /** Convertit une chaîne "1 234 567" (XPF) en entier. */
+  function parseXPF(value) {
+    var d = String(value == null ? "" : value).replace(/[^0-9]/g, "");
+    return d === "" ? 0 : parseInt(d, 10);
+  }
+
+  /** Formate un montant en XPF : séparateur de milliers = espace, sans centimes. */
+  function formatXPF(n) {
+    if (n == null || !isFinite(n)) return "\u2014";
+    var neg = n < 0;
+    var s = String(Math.round(Math.abs(n)));
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s + " XPF";
+  }
+
+  /** Formate un ratio décimal (0.052) en pourcentage (5,20 %). */
+  function formatPct(ratio, decimals) {
+    if (ratio == null || !isFinite(ratio)) return "\u2014";
+    var d = decimals == null ? 2 : decimals;
+    return (ratio * 100).toFixed(d).replace(".", ",") + " %";
+  }
+
+  /** Élément par identifiant. */
+  function el(id) { return document.getElementById(id); }
+
+  /** Valeur numérique (point décimal) d'un champ, 0 si vide/invalide. */
+  function valNum(id) {
+    var node = el(id);
+    var v = node ? parseFloat(node.value) : NaN;
+    return isFinite(v) ? v : 0;
+  }
+
+  /** Valeur XPF (entier) d'un champ. */
+  function valXPF(id) {
+    var node = el(id);
+    return node ? parseXPF(node.value) : 0;
+  }
+
+  /** Valeur sélectionnée d'un groupe de boutons radio. */
+  function valRadio(name) {
+    var r = form.querySelector('input[name="' + name + '"]:checked');
+    return r ? r.value : "";
+  }
+
+  /* ================================================================
+   * Module loan — échéancier de crédit
+   * ----------------------------------------------------------------
+   * - Mensualité à annuité constante :
+   *     M = C * i / (1 - (1+i)^-n)
+   *   avec C = capital emprunté, i = taux annuel / 12,
+   *   n = durée en mois. Si i = 0 : M = C / n.
+   * - Assurance de prêt mensuelle :
+   *     mode "% capital initial" : A = C * (taux_assurance / 100) / 12
+   *     mode "forfait mensuel"   : A = forfait fourni
+   * - Amortissement mensuel puis agrégation par année (CALCULS.md §1).
+   * ================================================================ */
+  var loan = {
+    /**
+     * @param {Object} p paramètres de financement
+     * @returns {Object} mensualité, échéancier agrégé par an, coûts totaux
+     */
+    build: function (p) {
+      var months = Math.max(0, Math.round((p.years || 0) * 12));
+      var C = Math.max(0, p.capital || 0);
+      var i = (p.annualRatePct || 0) / 100 / 12;
+
+      var monthlyPayment = 0;
+      if (months > 0 && C > 0) {
+        monthlyPayment = i === 0
+          ? C / months
+          : (C * i) / (1 - Math.pow(1 + i, -months));
+      }
+
+      var insuranceMonthly = p.insuranceMode === "forfait"
+        ? Math.max(0, p.insuranceForfaitMonthly || 0)
+        : C * ((p.insuranceRatePct || 0) / 100) / 12;
+
+      var years = [];
+      var totalInterest = 0;
+      var totalInsurance = 0;
+      var totalCapital = 0;
+      var cr = C;
+
+      for (var m = 1; m <= months; m++) {
+        var interest = cr * i;
+        var capitalPart = monthlyPayment - interest;
+        if (capitalPart < 0) capitalPart = 0;
+        if (capitalPart > cr) capitalPart = cr;
+        var crEnd = cr - capitalPart;
+        if (crEnd < 1e-6) crEnd = 0;
+
+        var yi = Math.ceil(m / 12) - 1;
+        if (!years[yi]) {
+          years[yi] = { year: yi + 1, interest: 0, capital: 0, insurance: 0, crEnd: 0 };
+        }
+        years[yi].interest += interest;
+        years[yi].capital += capitalPart;
+        years[yi].insurance += insuranceMonthly;
+        years[yi].crEnd = crEnd;
+
+        totalInterest += interest;
+        totalInsurance += insuranceMonthly;
+        totalCapital += capitalPart;
+        cr = crEnd;
+      }
+
+      var feesTotal = p.fees
+        ? (p.fees.dossier || 0) + (p.fees.garantie || 0) + (p.fees.courtier || 0)
+        : 0;
+
+      return {
+        months: months,
+        monthlyPayment: monthlyPayment,           // capital + intérêts (hors assurance)
+        insuranceMonthly: insuranceMonthly,       // assurance de prêt mensuelle
+        totalMonthly: monthlyPayment + insuranceMonthly,
+        years: years,                             // [{year, interest, capital, insurance, crEnd}]
+        totalInterest: totalInterest,
+        totalInsurance: totalInsurance,
+        totalCapital: totalCapital,
+        feesTotal: feesTotal,
+        // Coût total du crédit (CALCULS.md §1) : intérêts + assurance + frais uniques.
+        totalCost: totalInterest + totalInsurance + feesTotal
+      };
+    }
+  };
+
+  /* ================================================================
+   * Module revenue — recettes locatives et charges d'exploitation
+   * ----------------------------------------------------------------
+   * - Loyer indexé par an (CALCULS.md §3, points ouverts) :
+   *     loyer(k) = loyer_base * (1 + indexation)^(k-1)
+   *   Seuls les loyers sont indexés, pas les charges.
+   * - Vacance appliquée aux loyers et aux charges locatives rétrocédées.
+   * - Charges propriétaire : gestion (% loyer), copro, taxe foncière,
+   *   PNO, entretien (% loyer).
+   * - Impôt (CALCULS.md §4) : taux * max(0, résultat imposable),
+   *   SANS report de déficit. Résultat = loyer hors charges perçu
+   *   - charges d'exploitation - intérêts - assurance de prêt.
+   * ================================================================ */
+  var revenue = {
+    /**
+     * @param {Object} p paramètres de recettes/charges/fiscalité
+     * @param {Object} loanResult résultat de loan.build()
+     * @returns {Array} une ligne d'exploitation par année
+     */
+    build: function (p, loanResult) {
+      var nYears = SIM_YEARS;   // horizon étendu ; lignes crédit absentes → guard ci-dessous
+      var out = [];
+      var index = (p.indexationPct || 0) / 100;
+      var vac = (p.vacancyPct || 0) / 100;
+
+      for (var k = 1; k <= nYears; k++) {
+        var loyerMensuel = (p.rentMonthly || 0) * Math.pow(1 + index, k - 1);
+        var loyerAnnuelHC = loyerMensuel * 12;             // base avant vacance
+        var loyerPercu = loyerAnnuelHC * (1 - vac);        // net de vacance
+        var chargesRetro = (p.chargesLocativesMonthly || 0) * 12 * (1 - vac);
+
+        var gestion = (p.gestionPct || 0) / 100 * loyerAnnuelHC;
+        var copro = (p.coproMonthly || 0) * 12;
+        var taxeFonciere = p.taxeFonciereAnnual || 0;
+        var pno = p.pnoAnnual || 0;
+        var entretien = (p.entretienPct || 0) / 100 * (loyerAnnuelHC + chargesRetro);
+        var charges = gestion + copro + taxeFonciere + pno + entretien;
+
+        var recettes = loyerPercu + chargesRetro;
+
+        var lr = loanResult.years[k - 1] || { interest: 0, insurance: 0, capital: 0, crEnd: 0 };
+
+        var resultatImposable = loyerPercu - charges - lr.interest - lr.insurance;
+        var impot = (p.taxRatePct || 0) / 100 * Math.max(0, resultatImposable);
+
+        var creditAnnuel = (loanResult.years && k <= loanResult.years.length)
+          ? (loanResult.monthlyPayment + loanResult.insuranceMonthly) * 12
+          : 0;   // crédit soldé : plus de mensualité après la fin du prêt
+        var cashFlow = recettes - charges - creditAnnuel - impot;
+
+        out.push({
+          year: k,
+          loyerMensuel: loyerMensuel,
+          loyerAnnuelHC: loyerAnnuelHC,
+          loyerPercu: loyerPercu,
+          recettes: recettes,
+          gestion: gestion,
+          copro: copro,
+          taxeFonciere: taxeFonciere,
+          pno: pno,
+          entretien: entretien,
+          charges: charges,
+          interest: lr.interest,
+          insurance: lr.insurance,
+          capital: lr.capital,
+          crEnd: lr.crEnd,
+          resultatImposable: resultatImposable,
+          impot: impot,
+          creditAnnuel: creditAnnuel,
+          cashFlow: cashFlow
+        });
+      }
+      return out;
+    }
+  };
+
+  /* ================================================================
+   * Module metrics — indicateurs de rentabilité (CALCULS.md §7)
+   * ----------------------------------------------------------------
+   * - Rendement brut = loyer annuel net de vacance / prix FAI.
+   * - Rendement net avant dette =
+   *     (recettes totales - charges d'exploitation - impôt) / prix FAI,
+   *   ramené à l'année puis divisé par le prix FAI.
+   * - Cash-flow mensuel moyen = somme des flux annuels / N / 12.
+   * - Coûts du crédit repris du module loan.
+   * ================================================================ */
+  var metrics = {
+    /**
+     * @param {Object} p paramètres (prix FAI, surface, loyer, vacance)
+     * @param {Object} loanResult résultat de loan.build()
+     * @param {Array} yearly lignes annuelles de revenue.build()
+     * @returns {Object} indicateurs
+     */
+    build: function (p, loanResult, yearly) {
+      var prix = p.priceFAI || 0;
+      var n = yearly.length;
+
+      var totalRecettes = 0;
+      var totalCharges = 0;
+      var totalImpot = 0;
+      var totalCash = 0;
+      for (var k = 0; k < n; k++) {
+        totalRecettes += yearly[k].recettes;
+        totalCharges += yearly[k].charges;
+        totalImpot += yearly[k].impot;
+        totalCash += yearly[k].cashFlow;
+      }
+
+      var loyerAnnuelHC = (p.rentMonthly || 0) * 12;
+      var loyerPercu = loyerAnnuelHC * (1 - (p.vacancyPct || 0) / 100);
+
+      var rendementBrut = prix > 0 ? loyerPercu / prix : null;
+      var rendementNetAvantDette = (prix > 0 && n > 0)
+        ? ((totalRecettes - totalCharges - totalImpot) / n) / prix
+        : null;
+      var cashFlowMensuelMoyen = n > 0 ? totalCash / n / 12 : 0;
+      var prixM2 = (prix > 0 && p.surfaceHabitable > 0) ? prix / p.surfaceHabitable : null;
+
+      return {
+        rendementBrut: rendementBrut,
+        rendementNetAvantDette: rendementNetAvantDette,
+        cashFlowMensuelMoyen: cashFlowMensuelMoyen,
+        prixM2: prixM2,
+        totalInterest: loanResult.totalInterest,
+        totalInsurance: loanResult.totalInsurance,
+        totalLoanCost: loanResult.totalCost,
+        totalCashFlow: totalCash,
+        partLocataireAnnuelle: n > 0 ? yearly[0].recettes : 0,
+        nYears: n
+      };
+    }
+  };
+
+  /* ================================================================
+   * Lecture de la saisie (bloc 1) → paramètres du moteur
+   * ================================================================ */
+  function readParams() {
+    return {
+      priceFAI: valXPF("bien_prix_fai"),
+      surfaceHabitable: valNum("bien_surface_habitable"),
+      apport: valXPF("fin_apport"),
+      capital: valXPF("fin_montant_emprunte"),
+      years: valNum("fin_duree"),
+      annualRatePct: valNum("fin_taux"),
+      insuranceMode: valRadio("fin_assurance_mode") || "pct",
+      insuranceRatePct: valNum("fin_assurance_taux"),
+      insuranceForfaitMonthly: valXPF("fin_assurance_forfait"),
+      fees: {
+        dossier: valXPF("fin_frais_dossier"),
+        garantie: valXPF("fin_frais_garantie"),
+        courtier: valXPF("fin_frais_courtier")
+      },
+      fraisNotaire: valXPF("achat_frais_notaire"),
+      rentMonthly: valXPF("rec_loyer"),
+      indexationPct: valNum("rec_indexation"),
+      chargesLocativesMonthly: valXPF("rec_charges_locatives"),
+      vacancyPct: valNum("rec_vacance"),
+      gestionPct: valNum("rec_gestion"),
+      coproMonthly: valXPF("chg_copro"),
+      taxeFonciereAnnual: valXPF("chg_taxe_fonciere"),
+      pnoAnnual: valXPF("chg_pno"),
+      entretienPct: valNum("chg_entretien"),
+      taxRatePct: valNum("fisc_taux")
+    };
+  }
+
+  /** Chaîne le moteur complet pour une saisie donnée. */
+  function computeAll(params) {
+    var p = params || readParams();
+    var loanResult = loan.build(p);
+    var yearly = revenue.build(p, loanResult);
+    var kpis = metrics.build(p, loanResult, yearly);
+    return { params: p, loan: loanResult, yearly: yearly, metrics: kpis };
+  }
+
+  /* ================================================================
+   * Rendu — cartes du tableau de bord
+   * ================================================================ */
+  function card(label, value, cls, sub) {
+    return '<div class="card' + (cls ? " " + cls : "") + '">' +
+      '<div class="card-label">' + label + '</div>' +
+      '<div class="card-value">' + value + '</div>' +
+      (sub ? '<div class="card-sub">' + sub + '</div>' : "") +
+      '</div>';
+  }
+
+  function renderCards(result) {
+    var lr = result.loan;
+    var m = result.metrics;
+
+    var cards = [];
+    cards.push(card("Mensualité totale", formatXPF(lr.totalMonthly), "accent",
+      lr.months > 0
+        ? "capital+intérêts " + formatXPF(lr.monthlyPayment) + " + assurance " + formatXPF(lr.insuranceMonthly)
+        : "crédit non renseigné"));
+
+    cards.push(card("Part locataire / an", formatXPF(m.partLocataireAnnuelle), "",
+      "loyers + charges locatives, net de vacance (année 1)"));
+
+    var cf = m.cashFlowMensuelMoyen;
+    cards.push(card("Reste à charge mensuel", formatXPF(cf), cf < 0 ? "negative" : "positive",
+      "cash-flow mensuel moyen sur " + m.nYears + " an" + (m.nYears > 1 ? "s" : "")));
+
+    cards.push(card("Rendement brut", formatPct(m.rendementBrut), "",
+      "loyer net de vacance / prix FAI"));
+
+    cards.push(card("Rendement net avant dette", formatPct(m.rendementNetAvantDette), "",
+      "(recettes - charges - impôt) / prix FAI"));
+
+    cards.push(card("Prix au m\u00B2", m.prixM2 == null ? "\u2014" : formatXPF(m.prixM2) + "/m\u00B2", "",
+      "prix FAI / surface habitable"));
+
+    cards.push(card("Total intérêts", formatXPF(m.totalInterest), "negative",
+      "sur " + lr.months + " mois"));
+
+    cards.push(card("Total assurance", formatXPF(m.totalInsurance), "negative",
+      "assurance de prêt"));
+
+    cards.push(card("Coût total du crédit", formatXPF(m.totalLoanCost), "negative",
+      "intérêts + assurance + frais (" + formatXPF(lr.feesTotal) + ")"));
+
+    el("dash-cards").innerHTML = cards.join("");
+  }
+
+  /* Format compact pour le tableau (23 colonnes serrées) :
+   * montants en milliers sans unité (k) ; l'entête précise "k XPF". */
+  function formatK(n) {
+    if (n == null || !isFinite(n)) return "—";
+    var neg = n < 0;
+    var v = Math.round(Math.abs(n) / 1000);
+    var s = String(v).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s;
+  }
+
+  function formatMultipleK(m) {
+    if (m == null || !isFinite(m)) return "—";
+    return m.toFixed(2).replace(".", ",") + " ×";
+  }
+
+  /* ================================================================
+   * Rendu — tableau annuel condensé
+   * ================================================================ */
+  function renderTable(result) {
+    var body = el("annual-body");
+    var yearly = result.yearly;
+
+    if (!yearly.length) {
+      body.innerHTML = '<tr><td colspan="13" class="dash-empty">' +
+        "Renseignez le financement (montant emprunté, durée, taux) pour afficher l'échéancier." +
+        "</td></tr>";
+      return;
+    }
+
+    var rows = [];
+    var t = { capital: 0, interest: 0, insurance: 0, recettes: 0, charges: 0, impot: 0, cash: 0 };
+    for (var k = 0; k < yearly.length; k++) {
+      var y = yearly[k];
+
+      /* --- colonnes "si revente fin d'année k" (bloc 3) --- */
+      var cashRevente = null, gainTotal = null, multK = null, invK = null;
+      var B3mod = window.RentaInvestBloc3;
+      if (B3mod && typeof B3mod.resaleAt === "function") {
+        /* result peut venir du bloc 2 (clé params) ou du bloc 3 (clé p). */
+        var rp_ = result.rp || {};
+        var pRes = result.params || result.p;
+        var lRes = result.loan;
+        var yRes = result.yearly;
+        var at = B3mod.resaleAt(y.year, pRes, lRes, yRes, rp_);
+        if (at) {
+          invK = at.argentInvesti;           /* argent investi cumulé */
+          cashRevente = at.cashAtResale;     /* encaissé le jour de la vente */
+          gainTotal = at.totalGainIfSold;    /* bilan total si vente à K */
+          multK = at.multiple;               /* multiple à l'année K */
+        }
+      }
+
+      t.capital += y.capital;
+      t.interest += y.interest;
+      t.insurance += y.insurance;
+      t.recettes += y.recettes;
+      t.charges += y.charges;
+      t.impot += y.impot;
+      t.cash += y.cashFlow;
+
+      rows.push("<tr>" +
+        "<td>" + y.year + "</td>" +
+        "<td>" + formatK(y.capital) + "</td>" +
+        "<td>" + formatK(y.interest) + "</td>" +
+        "<td>" + formatK(y.insurance) + "</td>" +
+        "<td>" + formatK(y.recettes) + "</td>" +
+        "<td>" + formatK(y.charges) + "</td>" +
+        "<td>" + formatK(y.impot) + "</td>" +
+        '<td class="' + (y.cashFlow < 0 ? "neg" : "pos") + '">' + formatK(y.cashFlow) + "</td>" +
+        "<td>" + formatK(y.crEnd) + "</td>" +
+        (cashRevente == null
+          ? "<td>—</td><td>—</td><td>—</td><td>—</td>"
+          : "<td>" + formatK(invK) + "</td>" +
+            '<td>' + formatK(cashRevente) + "</td>" +
+            '<td class="' + (gainTotal < 0 ? "neg" : "pos") + '">' + formatK(gainTotal) + "</td>" +
+            "<td>" + (multK == null ? "—" : formatMultipleK(multK)) + "</td>") +
+        "</tr>");
+    }
+
+    rows.push('<tr class="total-row">' +
+      "<td>Total</td>" +
+      "<td>" + formatK(t.capital) + "</td>" +
+      "<td>" + formatK(t.interest) + "</td>" +
+      "<td>" + formatK(t.insurance) + "</td>" +
+      "<td>" + formatK(t.recettes) + "</td>" +
+      "<td>" + formatK(t.charges) + "</td>" +
+      "<td>" + formatK(t.impot) + "</td>" +
+      '<td class="' + (t.cash < 0 ? "neg" : "pos") + '">' + formatK(t.cash) + "</td>" +
+      "<td>—</td>" +
+      "<td>—</td><td>—</td><td>—</td><td>—</td>" +
+      "</tr>");
+
+    body.innerHTML = rows.join("");
+  }
+
+  /** Recalcule et redessine tout le tableau de bord. */
+  function refresh() {
+    var result = computeAll();
+    renderCards(result);
+    renderTable(result);
+    return result;
+  }
+
+  /* Recalcul en direct à chaque modification de la saisie existante. */
+  form.addEventListener("input", refresh);
+  form.addEventListener("change", refresh);
+
+  /* Le bouton Effacer du bloc 1 fait form.reset() sans émettre d'événement :
+   * on redessine le tableau de bord après son traitement. */
+  var btnEffacer = document.getElementById("btn-effacer");
+  if (btnEffacer) {
+    btnEffacer.addEventListener("click", function () {
+      setTimeout(refresh, 0);
+    });
+  }
+
+  /* Premier rendu (après restauration localStorage du bloc 1). */
+  refresh();
+
+  /* ================================================================
+   * Cas de test automatisé — console, déclenché par ?debug.test
+   * ----------------------------------------------------------------
+   * T2 33 M XPF + notaire 2,5 M + apport 6 M => emprunt 29,5 M
+   * sur 20 ans à 3,5 %, assurance 0,36 %/an du capital initial,
+   * loyer 145 000, charges copro 12 000, taxe foncière 40 000/an,
+   * PNO 30 000/an, vacance 5 %, entretien 5 %.
+   * ================================================================ */
+  function runConsoleTest() {
+    var p = {
+      priceFAI: 33000000,
+      surfaceHabitable: 0,
+      apport: 6000000,
+      capital: 29500000,
+      years: 20,
+      annualRatePct: 3.5,
+      insuranceMode: "pct",
+      insuranceRatePct: 0.36,
+      insuranceForfaitMonthly: 0,
+      fees: { dossier: 0, garantie: 0, courtier: 0 },
+      fraisNotaire: 2500000,
+      rentMonthly: 145000,
+      indexationPct: 0,
+      chargesLocativesMonthly: 0,
+      vacancyPct: 5,
+      gestionPct: 0,
+      coproMonthly: 12000,
+      taxeFonciereAnnual: 40000,
+      pnoAnnual: 30000,
+      entretienPct: 5,
+      taxRatePct: 0
+    };
+
+    var lr = loan.build(p);
+    var yearly = revenue.build(p, lr);
+    var m = metrics.build(p, lr, yearly);
+
+    var MENSUALITE_ATTENDUE = 163660;
+
+    console.log("%c[TEST BLOC 2] Cas T2 Nouméa (T2 33 M + notaire 2,5 M + apport 6 M)", "color:#4f9cf9;font-weight:bold");
+    console.log("Emprunt dérivé : " + formatXPF(p.capital) + " sur " + p.years + " ans à " + p.annualRatePct + " %");
+    console.log("Mensualité attendue (référence brief) : ~" + formatXPF(MENSUALITE_ATTENDUE));
+    console.log("Mensualité calculée (formule CALCULS.md) : " +
+      formatXPF(lr.monthlyPayment) + " hors assurance, " +
+      formatXPF(lr.totalMonthly) + " assurance incluse.");
+    if (Math.abs(lr.totalMonthly - MENSUALITE_ATTENDUE) > 500) {
+      console.warn("Écart avec la référence : " + formatXPF(lr.totalMonthly - MENSUALITE_ATTENDUE) +
+        ". Note : ~163 660 correspond à un taux d'environ 3,0 % ; à 3,5 % la formule " +
+        "d'annuité constante donne ~" + Math.round(lr.monthlyPayment) + " hors assurance.");
+    }
+
+    console.log("-- Indicateurs --");
+    console.log("Part locataire / an (recettes année 1) : " + formatXPF(m.partLocataireAnnuelle));
+    console.log("Reste à charge mensuel (cash-flow moyen) : " + formatXPF(m.cashFlowMensuelMoyen));
+    console.log("Rendement brut : " + formatPct(m.rendementBrut));
+    console.log("Rendement net avant dette : " + formatPct(m.rendementNetAvantDette));
+    console.log("Total intérêts : " + formatXPF(m.totalInterest));
+    console.log("Total assurance : " + formatXPF(m.totalInsurance));
+    console.log("Coût total du crédit : " + formatXPF(m.totalLoanCost));
+
+    if (console.table) {
+      console.table(yearly.map(function (y) {
+        return {
+          Année: y.year,
+          "Capital remboursé": Math.round(y.capital),
+          "Intérêts": Math.round(y.interest),
+          "Assurance": Math.round(y.insurance),
+          "Recettes": Math.round(y.recettes),
+          "Charges": Math.round(y.charges),
+          "Impôt": Math.round(y.impot),
+          "Cash-flow": Math.round(y.cashFlow),
+          "CR fin": Math.round(y.crEnd)
+        };
+      }));
+    }
+  }
+
+  var hasDebugTest = location.search.indexOf("debug.test") !== -1 ||
+    location.hash.indexOf("debug.test") !== -1;
+  if (hasDebugTest) runConsoleTest();
+
+  /* Exposé pour vérification manuelle / console du navigateur. */
+  window.RentaInvestBloc2 = {
+    SIM_YEARS: SIM_YEARS,
+    loan: loan,
+    revenue: revenue,
+    metrics: metrics,
+    computeAll: computeAll,
+    refresh: refresh,
+    renderTable: renderTable
+  };
+})();
+</script>
+
+<script>
+/* ================================================================
+ * Renta Invest Immo — BLOC 3 : scénario de revente + TRI
+ * ----------------------------------------------------------------
+ * Ajout isolé : ne modifie ni la saisie (bloc 1) ni le moteur/tableau
+ * de bord existant (bloc 2). Ce module :
+ *   - lit les champs de revente du formulaire existant ;
+ *   - calcule prix de revente, frais de vente, capital restant dû CR_N,
+ *     plus-value (brute / nette), impôt plus-value et flux de revente ;
+ *   - calcule le TRI (IRR par dichotomie, -0.5 .. 5.0, tolérance 1e-10)
+ *     et le multiple d'argent investi ;
+ *   - ajoute 4 cartes au tableau de bord et annote la ligne N du
+ *     tableau annuel (badge visuel distinct) ;
+ *   - étend le cas de test console ?debug.test.
+ * Formules de référence : docs/CALCULS.md §6-7.
+ * ================================================================ */
+(function () {
+  "use strict";
+
+  var B2 = window.RentaInvestBloc2;
+  var form = document.getElementById("form-saisie");
+  if (!form || !B2) return;
+
+  /* ================================================================
+   * Utilitaires numériques et formatage (copies locales isolées ;
+   * aucune dépendance sur les fonctions privées du bloc 2)
+   * ================================================================ */
+  function el(id) { return document.getElementById(id); }
+
+  function parseXPF(value) {
+    var d = String(value == null ? "" : value).replace(/[^0-9]/g, "");
+    return d === "" ? 0 : parseInt(d, 10);
+  }
+
+  function formatXPF(n) {
+    if (n == null || !isFinite(n)) return "\u2014";
+    var neg = n < 0;
+    var s = String(Math.round(Math.abs(n)));
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s;
+  }
+
+  function formatPct(ratio, decimals) {
+    if (ratio == null || !isFinite(ratio)) return "\u2014";
+    var d = decimals == null ? 2 : decimals;
+    return (ratio * 100).toFixed(d).replace(".", ",") + " %";
+  }
+
+  function formatMultiple(n) {
+    if (n == null || !isFinite(n)) return "\u2014";
+    return n.toFixed(2).replace(".", ",") + " \u00D7";
+  }
+
+  /* Version compacte pour le badge "revente" du tableau annuel (k XPF). */
+  function formatK(n) {
+    if (n == null || !isFinite(n)) return "\u2014";
+    var neg = n < 0;
+    var s = String(Math.round(Math.abs(n) / 1000)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s;
+  }
+
+  function valNum(id) {
+    var node = el(id);
+    var v = node ? parseFloat(node.value) : NaN;
+    return isFinite(v) ? v : 0;
+  }
+
+  function valXPF(id) {
+    var node = el(id);
+    return node ? parseXPF(node.value) : 0;
+  }
+
+  function valSelect(id) {
+    var node = el(id);
+    return node ? node.value : "";
+  }
+
+  /* ================================================================
+   * Module resale — revente, plus-value, flux final (CALCULS.md §6)
+   * ----------------------------------------------------------------
+   * - Prix de vente : saisi (mode montant) OU prix FAI*(1+évol)^N.
+   * - Frais de vente = frais_pct * prix de vente.
+   * - CR_N = capital restant dû à la fin de l'année N (échéancier bloc 2 ;
+   *   0 si la détention dépasse le crédit, déjà soldé).
+   * - Plus-value = prix de vente - frais de vente - prix FAI.
+   * - Impôt PV = taux_PV * max(0, plus-value).
+   * - Flux de revente = prix de vente - frais de vente - CR_N - impôt.
+   * ================================================================ */
+  var resale = {
+    build: function (rp, p, loanResult, yearly) {
+      var N = Math.max(0, Math.round((rp && rp.holdingYears) || 0));
+      var prixFAI = Math.max(0, (p && p.priceFAI) || 0);
+
+      var salePrice;
+      if (rp && rp.modePrix === "montant") {
+        salePrice = Math.max(0, rp.prixMontant || 0);
+      } else if (rp && rp.modePrix === "achat") {
+        salePrice = prixFAI;   // revente au prix d'achat : aucune plus-value
+      } else {
+        salePrice = prixFAI * Math.pow(1 + ((rp && rp.evolutionPct) || 0) / 100, N);
+      }
+
+      var saleFees = salePrice * (((rp && rp.fraisVentePct) || 0) / 100);
+
+      var loanYears = loanResult && loanResult.years ? loanResult.years.length : 0;
+      var crN = (N > 0 && N <= loanYears) ? loanResult.years[N - 1].crEnd : 0;
+
+      var capitalGainGross = salePrice - saleFees - prixFAI;
+      var taxPV = (((rp && rp.taxPVPct) || 0) / 100) * Math.max(0, capitalGainGross);
+      var capitalGainNet = capitalGainGross - taxPV;
+      var resaleCashFlow = salePrice - saleFees - crN - taxPV;
+
+      var fees = (p && p.fees) || {};
+      var initialInvest = ((p && p.apport) || 0) + ((p && p.fraisNotaire) || 0) +
+        (fees.dossier || 0) + (fees.garantie || 0) + (fees.courtier || 0);
+
+      return {
+        holdingYears: N,
+        initialInvest: initialInvest,
+        salePrice: salePrice,
+        saleFees: saleFees,
+        crN: crN,
+        capitalGainGross: capitalGainGross,
+        taxPV: taxPV,
+        capitalGainNet: capitalGainNet,
+        resaleCashFlow: resaleCashFlow
+      };
+    }
+  };
+
+  /* ================================================================
+   * resaleAt — si je vends à la fin de l'année K (K = 1..30),
+   * quel est mon cash et mon gain total ?
+   * ----------------------------------------------------------------
+   * cashAtResale   = prix de vente − frais de vente − CR_K − impôt PV
+   *                  (encaissé le jour de la vente)
+   * totalGainIfSold = cashAtResale + Σ cash-flows exploitation (1..K)
+   *                   − investissement initial
+   *                  (= gain/perte total du projet si vente à K)
+   * Le prix de vente suit le mode choisi (achat / montant / %).
+   * ================================================================ */
+  function resaleAt(K, p, loanResult, yearly, rp) {
+    K = Math.max(0, Math.round(K || 0));
+    if (K < 1) return null;
+
+    var saleParams = { holdingYears: K };
+    var r = resale.build(saleParams, p, loanResult, yearly);
+
+    /* cumul des cash-flows d'exploitation jusqu'à K inclus
+     * (annualCashFlow gère aussi les années après la fin du crédit) */
+    var cumFlows = 0;
+    for (var k = 1; k <= K; k++) cumFlows += annualCashFlow(k, p, yearly);
+
+    var modeUsed = (rp && rp.modePrix) === "montant"
+      ? "montant"
+      : (rp && rp.modePrix) === "pourcentage" ? "pourcentage" : "achat";
+
+    var initial = r.initialInvest;
+    /* argent investi à l'année K = extension initiale + cumul des déficits
+     * de cash-flow (somme des années où tu dois verser de ta poche). */
+    var sumPos = 0, sumNeg = 0;
+    for (var k2 = 1; k2 <= K; k2++) {
+      var cfk = annualCashFlow(k2, p, yearly);
+      if (cfk > 0) sumPos += cfk; else sumNeg += cfk;
+    }
+    var argentInvesti = initial + Math.abs(sumNeg);
+    var multipleK = argentInvesti > 0
+      ? (sumPos + r.resaleCashFlow) / argentInvesti
+      : null;
+    return {
+      year: K,
+      modeUsed: modeUsed,
+      salePrice: r.salePrice,
+      saleFees: r.saleFees,
+      crK: r.crN,
+      taxPV: r.taxPV,
+      cashAtResale: r.resaleCashFlow,
+      cumulExploitation: cumFlows,
+      totalGainIfSold: r.resaleCashFlow + cumFlows - initial,
+      argentInvesti: argentInvesti,
+      multiple: multipleK
+    };
+  }
+
+  /* ================================================================
+   * Cash-flow annuel d'exploitation pour l'année k.
+   * Réutilise la ligne du bloc 2 si elle existe ; au-delà de la durée
+   * du crédit, le crédit est soldé (mensualité = 0) et la formule
+   * d'exploitation est reproduite à l'identique.
+   * ================================================================ */
+  function annualCashFlow(k, p, yearly) {
+    if (k >= 1 && yearly && k <= yearly.length) return yearly[k - 1].cashFlow;
+
+    var index = ((p && p.indexationPct) || 0) / 100;
+    var vac = ((p && p.vacancyPct) || 0) / 100;
+    var loyerAnnuelHC = ((p && p.rentMonthly) || 0) * Math.pow(1 + index, k - 1) * 12;
+    var loyerPercu = loyerAnnuelHC * (1 - vac);
+    var chargesRetro = ((p && p.chargesLocativesMonthly) || 0) * 12 * (1 - vac);
+    var gestion = (((p && p.gestionPct) || 0) / 100) * loyerAnnuelHC;
+    var charges = gestion +
+      ((p && p.coproMonthly) || 0) * 12 +
+      ((p && p.taxeFonciereAnnual) || 0) +
+      ((p && p.pnoAnnual) || 0) +
+      (((p && p.entretienPct) || 0) / 100) * loyerAnnuelHC;
+    var recettes = loyerPercu + chargesRetro;
+    var impot = (((p && p.taxRatePct) || 0) / 100) * Math.max(0, loyerPercu - charges);
+    return recettes - charges - impot;
+  }
+
+  /* ================================================================
+   * Module tri — IRR par dichotomie (CALCULS.md §7)
+   * ----------------------------------------------------------------
+   * Flux :
+   *   année 0     = -(apport + notaire + dossier + garantie + courtier)
+   *   années 1..N-1 = cash-flow annuel
+   *   année N     = cash-flow annuel + flux de revente
+   * IRR r tel que VAN(r) = somme flux_t / (1+r)^t = 0, recherche
+   * bornée entre -0.5 et 5.0, tolérance 1e-10.
+   * Multiple = (somme flux positifs + flux net de revente) /
+   *            (investissement initial + |somme flux négatifs|).
+   * ================================================================ */
+  function npv(rate, flows) {
+    var s = 0;
+    var disc = 1;
+    for (var t = 0; t < flows.length; t++) {
+      s += flows[t] / disc;
+      disc *= (1 + rate);
+    }
+    return s;
+  }
+
+  function irrBisection(flows, lo, hi, tol) {
+    lo = lo == null ? -0.5 : lo;
+    hi = hi == null ? 5.0 : hi;
+    tol = tol == null ? 1e-10 : tol;
+
+    var fLo = npv(lo, flows);
+    var fHi = npv(hi, flows);
+    if (!isFinite(fLo) || !isFinite(fHi)) return null;
+    if (fLo === 0) return lo;
+    if (fHi === 0) return hi;
+    if (fLo * fHi > 0) return null;
+
+    var mid = (lo + hi) / 2;
+    for (var it = 0; it < 200; it++) {
+      mid = (lo + hi) / 2;
+      var fMid = npv(mid, flows);
+      if (Math.abs(hi - lo) < tol || fMid === 0) return mid;
+      if (fLo * fMid < 0) { hi = mid; }
+      else { lo = mid; fLo = fMid; }
+    }
+    return mid;
+  }
+
+  var tri = {
+    build: function (rp, p, loanResult, yearly, resaleRes) {
+      var N = resaleRes.holdingYears;
+      var initial = resaleRes.initialInvest;
+      var flows = [-initial];
+      var sumPos = 0;
+      var sumNeg = 0;
+
+      for (var k = 1; k <= N; k++) {
+        var cf = annualCashFlow(k, p, yearly);
+        if (k < N) {
+          if (cf > 0) sumPos += cf;
+          else sumNeg += cf;
+          flows.push(cf);
+        } else {
+          flows.push(cf + resaleRes.resaleCashFlow);
+        }
+      }
+
+      var irr = (N > 0 && initial > 0) ? irrBisection(flows) : null;
+      var denom = initial + Math.abs(sumNeg);
+      var multiple = (N > 0 && denom > 0)
+        ? (sumPos + resaleRes.resaleCashFlow) / denom
+        : null;
+
+      return {
+        flows: flows,
+        irr: irr,
+        multiple: multiple,
+        sumPositive: sumPos,
+        sumNegative: sumNeg,
+        initialInvest: initial
+      };
+    }
+  };
+
+  /* ================================================================
+   * Orchestration : moteur bloc 2 (réutilisé) + revente + TRI
+   * ================================================================ */
+  function computeScenario(p, rp) {
+    var loanResult = B2.loan.build(p);
+    var yearly = B2.revenue.build(p, loanResult);
+    var resaleRes = resale.build(rp, p, loanResult, yearly);
+    var triRes = tri.build(rp, p, loanResult, yearly, resaleRes);
+    return { p: p, rp: rp, loan: loanResult, yearly: yearly, resale: resaleRes, tri: triRes };
+  }
+
+  function readResaleParams() {
+    return {
+      modePrix: valSelect("rev_mode_prix") || "achat",
+      prixMontant: valXPF("rev_prix_montant"),
+      evolutionPct: valNum("rev_evolution"),
+      holdingYears: valNum("rev_duree_detention"),
+      fraisVentePct: valNum("rev_frais_vente"),
+      taxPVPct: valNum("rev_taux_plus_value")
+    };
+  }
+
+  function computeAllScenario() {
+    var base = B2.computeAll();
+    var rp = readResaleParams();
+    var resaleRes = resale.build(rp, base.params, base.loan, base.yearly);
+    var triRes = tri.build(rp, base.params, base.loan, base.yearly, resaleRes);
+    return { p: base.params, rp: rp, loan: base.loan, yearly: base.yearly, resale: resaleRes, tri: triRes };
+  }
+
+  /* ================================================================
+   * Rendu — 4 cartes de scénario de revente
+   * ================================================================ */
+  function localCard(label, value, cls, sub) {
+    return '<div class="card card-scenario' + (cls ? " " + cls : "") + '">' +
+      '<div class="card-label">' + label + '</div>' +
+      '<div class="card-value">' + value + '</div>' +
+      (sub ? '<div class="card-sub">' + sub + '</div>' : "") +
+      '</div>';
+  }
+
+  function renderScenarioCards(result) {
+    var r = result.resale;
+    var t = result.tri;
+    var rp = result.rp;
+    var target = el("dash-cards");
+    if (!target) return;
+    /* idempotent : purge les cartes scénario précédentes avant d'ajouter */
+    var olds = target.querySelectorAll(".card.card-scenario");
+    for (var oi = 0; oi < olds.length; oi++) olds[oi].parentNode.removeChild(olds[oi]);
+
+    var subPrix;
+    if (rp.modePrix === "montant") subPrix = "montant saisi";
+    else if (rp.modePrix === "achat") subPrix = "prix d'achat FAI (revente sans plus-value)";
+    else subPrix = "prix FAI × (1 + " + formatPct(rp.evolutionPct / 100) + ")^" + r.holdingYears;
+
+    var cards = [];
+    cards.push(localCard("Prix de revente estimé", formatXPF(r.salePrice) + " XPF", "accent",
+      subPrix + " \u2014 détention " + r.holdingYears + " an" + (r.holdingYears > 1 ? "s" : "")));
+
+    cards.push(localCard("Plus-value", formatXPF(r.capitalGainGross) + " XPF",
+      r.capitalGainGross < 0 ? "negative" : "positive",
+      "nette d'impôt : " + formatXPF(r.capitalGainNet) + " XPF (impôt PV " + formatXPF(r.taxPV) + " XPF)"));
+
+    cards.push(localCard("TRI annualisé", t.irr == null ? "\u2014" : formatPct(t.irr),
+      t.irr == null ? "" : (t.irr < 0 ? "negative" : "positive"),
+      "flux de revente inclus, sur " + r.holdingYears + " an" + (r.holdingYears > 1 ? "s" : "")));
+
+    cards.push(localCard("Multiple d'argent investi",
+      t.multiple == null ? "\u2014" : formatMultiple(t.multiple), "accent-soft",
+      "flux positifs + revente / argent investi"));
+
+    target.insertAdjacentHTML("beforeend", cards.join(""));
+  }
+
+  /* ================================================================
+   * Rendu — annotation de la ligne N du tableau annuel existant
+   * (badge visuel distinct ; aucune colonne ajoutée)
+   * ================================================================ */
+  function decorateTable(result) {
+    var r = result.resale;
+    var body = el("annual-body");
+    if (!body || !r.holdingYears) return;
+
+    var rows = body.querySelectorAll("tr");
+    for (var i = 0; i < rows.length; i++) {
+      var firstTd = rows[i].querySelector("td");
+      if (!firstTd) continue;
+      if (firstTd.textContent.trim() !== String(r.holdingYears)) continue;
+
+      rows[i].classList.add("row-revente");
+    }
+
+    var foot = el("dash-footnote");
+    if (foot) {
+      foot.textContent = "Revente année " + r.holdingYears +
+        " : prix " + formatXPF(r.salePrice) +
+        " \u2212 frais " + formatXPF(r.saleFees) +
+        " \u2212 CR " + formatXPF(r.crN) +
+        " \u2212 impôt PV " + formatXPF(r.taxPV) +
+        " = flux " + formatXPF(r.resaleCashFlow) + " XPF.";
+    }
+  }
+
+  /** Recalcule revente + TRI et redessine les ajouts bloc 3
+   *  + la table (colonnes cash/gain si revente, calculées via resaleAt). */
+  function refresh3() {
+    var result = computeAllScenario();
+    renderScenarioCards(result);
+    if (B2 && typeof B2.renderTable === "function") B2.renderTable(result);
+    decorateTable(attrs(result));
+    return result;
+  }
+  /* le badge revente ne dépend pas des nouvelles colonnes : passe l'objet attendu */
+  function attrs(result) {
+    return { resale: result.resale, rp: result.rp };
+  }
+
+  /* Recalcul en dernier (les listeners bloc 2 sont enregistrés avant). */
+  form.addEventListener("input", refresh3);
+  form.addEventListener("change", refresh3);
+
+  /* Le bouton Effacer du bloc 1/2 réinitialise sans événement de formulaire. */
+  var btnEffacer = el("btn-effacer");
+  if (btnEffacer) {
+    btnEffacer.addEventListener("click", function () { setTimeout(refresh3, 0); });
+  }
+
+  /* Premier rendu (après restauration localStorage + rendu bloc 2). */
+  refresh3();
+
+  /* ================================================================
+   * Cas de test console ?debug.test — scénario de revente
+   * ----------------------------------------------------------------
+   * Bien NC par défaut : prix FAI 15 000 000, apport 2 250 000,
+   * emprunt 14 350 000 sur 20 ans à 3,5 %, assurance 0,36 %/an,
+   * notaire 1 650 000, frais dossier 30 000 + garantie 50 000.
+   * Revente à 15 ans, marché +1 %/an, frais d'agence 4 %, PV 0 %.
+   * Prix de revente attendu ≈ 17 410 000 XPF.
+   * ================================================================ */
+  function runBloc3Test() {
+    var p = {
+      priceFAI: 15000000,
+      surfaceHabitable: 60,
+      apport: 2250000,
+      capital: 14350000,
+      years: 20,
+      annualRatePct: 3.5,
+      insuranceMode: "pct",
+      insuranceRatePct: 0.36,
+      insuranceForfaitMonthly: 0,
+      fees: { dossier: 30000, garantie: 50000, courtier: 0 },
+      fraisNotaire: 1650000,
+      rentMonthly: 100000,
+      indexationPct: 0,
+      chargesLocativesMonthly: 5000,
+      vacancyPct: 5,
+      gestionPct: 0,
+      coproMonthly: 8000,
+      taxeFonciereAnnual: 45000,
+      pnoAnnual: 35000,
+      entretienPct: 5,
+      taxRatePct: 25
+    };
+    var rp = {
+      modePrix: "pourcentage",
+      prixMontant: 0,
+      evolutionPct: 1,
+      holdingYears: 15,
+      fraisVentePct: 4,
+      taxPVPct: 0
+    };
+
+    var res = computeScenario(p, rp);
+    var r = res.resale;
+    var t = res.tri;
+    var PRIX_REVENTE_ATTENDU = 17410000;
+
+    console.log("%c[TEST BLOC 3] Revente à 15 ans, +1 %/an, frais 4 %, PV 0 %", "color:#4f9cf9;font-weight:bold");
+    console.log("Prix de revente attendu (brief)      : ~" + formatXPF(PRIX_REVENTE_ATTENDU) + " XPF");
+    console.log("Prix de revente calculé              : " + formatXPF(r.salePrice) + " XPF");
+    console.log("Frais de vente (" + rp.fraisVentePct + " %)              : " + formatXPF(r.saleFees) + " XPF");
+    console.log("CR à " + r.holdingYears + " ans                         : " + formatXPF(r.crN) + " XPF");
+    console.log("Plus-value brute                     : " + formatXPF(r.capitalGainGross) + " XPF");
+    console.log("Impôt plus-value (" + rp.taxPVPct + " %)            : " + formatXPF(r.taxPV) + " XPF");
+    console.log("Plus-value nette d'impôt             : " + formatXPF(r.capitalGainNet) + " XPF");
+    console.log("Flux de revente (fin année " + r.holdingYears + ")      : " + formatXPF(r.resaleCashFlow) + " XPF");
+    console.log("Investissement initial (année 0)     : " + formatXPF(r.initialInvest) + " XPF");
+    console.log("TRI annualisé                        : " + formatPct(t.irr));
+    console.log("Multiple d'argent investi            : " + formatMultiple(t.multiple));
+    console.log("Flux du projet (année 0 .. " + r.holdingYears + ")   : " +
+      t.flows.map(function (f, i) { return i + ":" + formatXPF(f); }).join("  "));
+
+    if (Math.abs(r.salePrice - PRIX_REVENTE_ATTENDU) > 20000) {
+      console.warn("Écart avec le prix de revente attendu : " +
+        formatXPF(r.salePrice - PRIX_REVENTE_ATTENDU) + " XPF (tolérance 20 000).");
+    }
+  }
+
+  var hasDebugTest = location.search.indexOf("debug.test") !== -1 ||
+    location.hash.indexOf("debug.test") !== -1;
+  if (hasDebugTest) runBloc3Test();
+
+  /* Exposé pour vérification manuelle / console du navigateur. */
+  window.RentaInvestBloc3 = {
+    resale: resale,
+    tri: tri,
+    resaleAt: resaleAt,
+    computeScenario: computeScenario,
+    computeAllScenario: computeAllScenario,
+    refresh: refresh3
+  };
+})();
+</script>
+
+<script>
+/* ================================================================
+ * Renta Invest Immo — BLOC 4 : visuels SVG maison
+ * ----------------------------------------------------------------
+ * Ajout isolé : ne modifie pas la saisie (bloc 1), le moteur (bloc 2)
+ * ni le scénario de revente (bloc 3). Trois graphiques SVG générés
+ * à la main (aucune librairie) :
+ *   1. Amortissement annuel : barres empilées capital / intérêts /
+ *      assurance + ligne capital restant dû (axe de droite).
+ *   2. Qui paie quoi (CALCULS.md §8, ordre validé) : barres locales
+ *      locataire vs reste à charge + courbes cumulées (axe droit).
+ *   3. Profil du TRI (% annualisé) et du multiple selon la durée de
+ *      détention 1..20 (bornée par la durée du crédit), deux axes.
+ * Lit le moteur bloc 2 (window.RentaInvestBloc2) et bloc 3
+ * (window.RentaInvestBloc3). Formules : docs/CALCULS.md §5 + §8.
+ * ================================================================ */
+(function () {
+  "use strict";
+
+  var B2 = window.RentaInvestBloc2;
+  var B3 = window.RentaInvestBloc3;
+  if (!B2 || !B3) return;
+
+  /* ================================================================
+   * Utilitaires
+   * ================================================================ */
+  function el(id) { return document.getElementById(id); }
+
+  function fmtCompact(n) {
+    if (n == null || !isFinite(n)) return "—";
+    var abs = Math.abs(n);
+    var s;
+    if (abs >= 1000000) s = (n / 1000000).toFixed(abs >= 10000000 ? 0 : 1).replace(".", ",").replace(",0", "") + " M";
+    else if (abs >= 1000) s = Math.round(n / 1000) + " k";
+    else s = String(Math.round(n));
+    return (n < 0 && s.charAt(0) !== "-" ? "-" : "") + s;
+  }
+
+  function fmtPctShort(ratio) {
+    if (ratio == null || !isFinite(ratio)) return "—";
+    return (ratio * 100).toFixed(1).replace(".", ",") + " %";
+  }
+
+  function fmtNum2(n) {
+    if (n == null || !isFinite(n)) return "—";
+    return n.toFixed(2).replace(".", ",");
+  }
+
+  function escXml(s) {
+    return String(s)
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, "'");
+  }
+
+  /* ================================================================
+   * Constantes SVG partagées
+   * ================================================================ */
+  var W = 920;
+  var H_C1 = 300;
+  var H_C2 = 320;
+  var H_C3 = 300;
+  var MARG = { left: 74, right: 74, top: 34, bottom: 34 };
+  var COLORS = {
+    capital: "#4f9cf9",
+    interest: "#e5c07b",
+    insurance: "#c678dd",
+    crLine: "#7ec699",
+    locataire: "#7ec699",
+    racharge: "#e06c75",
+    tri: "#4f9cf9",
+    multiple: "#e5c07b",
+    axis: "#3a4048",
+    grid: "#2c313a",
+    text: "#9aa2ad"
+  };
+  var DATE_GREY = "#737b86";
+
+  /* ================================================================
+   * Primitives SVG
+   * ================================================================ */
+  function svgOpen(width, height) {
+    return '<svg class="chart-svg" viewBox="0 0 ' + width + " " + height +
+      '" preserveAspectRatio="xMidYMid meet" role="img" xmlns="http://www.w3.org/2000/svg">';
+  }
+
+  function lineEl(x1, y1, x2, y2, color, opt) {
+    opt = opt || {};
+    return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 +
+      '" stroke="' + color + '" stroke-width="' + (opt.w || 1) +
+      (opt.dash ? '" stroke-dasharray="' + opt.dash : "") +
+      +'" opacity="' + (opt.opacity != null ? opt.opacity : 1) + '"/>';
+  }
+
+  function rectEl(x, y, w, h, fill, opt) {
+    opt = opt || {};
+    return '<rect x="' + x + '" y="' + y + '" width="' + Math.max(0, w) +
+      '" height="' + Math.max(0, h) + '" fill="' + fill + '"' +
+      (opt.ry != null ? ' rx="' + opt.ry + '"' : "") +
+      (opt.opacity != null ? ' opacity="' + opt.opacity : "") +
+      '">' + (opt.title ? "<title>" + escXml(opt.title) + "</title>" : "") +
+      "</rect>";
+  }
+
+  function textEl(x, y, str, opt) {
+    opt = opt || {};
+    return '<text x="' + x + '" y="' + y + '"' +
+      (opt.anchor ? ' text-anchor="' + opt.anchor + '"' : "") +
+      ' font-size="' + (opt.size || 10) + '"' +
+      ' fill="' + (opt.fill || COLORS.text) + '"' +
+      (opt.weight ? ' font-weight="' + opt.weight + '"' : "") +
+      ">" + escXml(str) + "</text>";
+  }
+
+  function legendEl(items, top) {
+    /* items : [{label, color, shape}] shape: "rect" | "line" */
+    var x = MARG.left;
+    var s = "";
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (it.shape === "line") {
+        s += lineEl(x, top, x + 18, top, it.color, { w: 2 });
+      } else {
+        s += rectEl(x, top - 4, 18, 8, it.color, { ry: 1.5 });
+      }
+      s += textEl(x + 24, top + 4, it.label, { size: 11 });
+      x += 24 + 11 + 6 + (it.label.length * 5.6) + 24;
+    }
+    return s;
+  }
+
+  /* ================================================================
+   * Échelles / axes
+   * ================================================================ */
+  function niceCeil(v) {
+    if (!isFinite(v) || v <= 0) return 1;
+    var exp = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+    var n = v / exp;
+    var step;
+    if (n <= 1) step = 1;
+    else if (n <= 2) step = 2;
+    else if (n <= 2.5) step = 2.5;
+    else if (n <= 5) step = 5;
+    else step = 10;
+    return step * exp;
+  }
+  function niceFloor(v) {
+    if (!isFinite(v) || v >= 0) return 0;
+    return -niceCeil(-v);
+  }
+
+  function xCenter(nYears, k) {
+    var lo = MARG.left, hi = W - MARG.right, width = hi - lo;
+    return lo + ((k - 0.5) / nYears) * width;
+  }
+  function xStep(nYears) {
+    return (W - MARG.right - MARG.left) / nYears;
+  }
+
+  /* Domaine y générique : [lo, hi] avec grille + étiquettes des 2 côtés. */
+  function drawGrid(domain, top, height, fmtLeft, fmtRight, rightMaxOverride) {
+    var s = "";
+    var y0 = top + height - MARG.bottom;
+    var yTop = top + MARG.top;
+    var ticks = 5;
+    for (var k = 0; k <= ticks; k++) {
+      var val = domain.lo + ((domain.hi - domain.lo) / ticks) * k;
+      var y = y0 - ((val - domain.lo) / (domain.hi - domain.lo)) * (y0 - yTop);
+      s += lineEl(MARG.left, y, W - MARG.right, y, k === 0 ? COLORS.axis : COLORS.grid);
+      s += textEl(MARG.left - 8, y + 4, fmtLeft(val), { anchor: "end", size: 10 });
+      if (fmtRight) {
+        var rMax = rightMaxOverride != null ? rightMaxOverride : domain.hi;
+        var rVal = (val - domain.lo) / (domain.hi - domain.lo) * rMax;
+        s += textEl(W - MARG.right + 8, y + 4, fmtRight(rVal), { anchor: "start", size: 10, fill: DATE_GREY });
+      }
+    }
+    s += lineEl(MARG.left, top + MARG.top, MARG.left, y0, COLORS.axis);
+    s += lineEl(W - MARG.right, top + MARG.top, W - MARG.right, y0, COLORS.axis, { opacity: 0.4 });
+    return s;
+  }
+
+  function yFromVal(val, domain, top, height) {
+    var y0 = top + height - MARG.bottom;
+    var yTop = top + MARG.top;
+    return y0 - ((val - domain.lo) / (domain.hi - domain.lo)) * (y0 - yTop);
+  }
+
+  function xAxisYears(nYears, top, height) {
+    var s = "";
+    var y = top + height - MARG.bottom + 15;
+    var every = Math.max(1, Math.ceil(nYears / 20));
+    for (var k = 1; k <= nYears; k++) {
+      if (k % every !== 0 && k !== nYears) continue;
+      s += textEl(xCenter(nYears, k), y, String(k), { anchor: "middle", size: 10 });
+    }
+    return s;
+  }
+
+  function polylineEl(points, color, opt) {
+    opt = opt || {};
+    return '<polyline points="' + points + '" fill="none" stroke="' + color +
+      '" stroke-width="' + (opt.w || 2) + '"' +
+      (opt.dash ? ' stroke-dasharray="' + opt.dash + '"' : "") +
+      (opt.opacity != null ? ' opacity="' + opt.opacity : "") + "/>";
+  }
+
+  function dotEl(x, y, color, title) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="' + color + '">' +
+      (title ? "<title>" + escXml(title) + "</title>" : "") + "</circle>";
+  }
+
+  /* ================================================================
+   * Graphique 1 — amortissement annuel
+   * ================================================================ */
+  function renderChart1(result) {
+    var host = el("chart1");
+    if (!host) return;
+    var yearly = result.yearly || [];
+    var p = result.p || {};
+    if (!yearly.length) {
+      host.innerHTML = '<div class="chart-empty">Renseignez le financement (montant emprunté, durée, taux) pour afficher l\'échéancier.</div>';
+      return;
+    }
+
+    var n = yearly.length;
+    var domain = { lo: 0, hi: niceCeil(0) };
+    /* max de la pile = max(capital + intérêts + assurance) */
+    var maxStack = 0;
+    for (var i = 0; i < n; i++) {
+      var tot = (yearly[i].capital || 0) + (yearly[i].interest || 0) + (yearly[i].insurance || 0);
+      if (tot > maxStack) maxStack = tot;
+    }
+    domain.hi = niceCeil(maxStack);
+    var crMax = niceCeil(Math.max(1, p.capital || 0));
+
+    var barW = Math.max(4, Math.floor(xStep(n) * 0.62));
+    var y0 = 0 + H_C1 - MARG.bottom;
+
+    var s = svgOpen(W, H_C1);
+    s += legendEl([
+      { label: "capital", color: COLORS.capital },
+      { label: "intérêts", color: COLORS.interest },
+      { label: "assurance", color: COLORS.insurance },
+      { label: "capital restant dû", color: COLORS.crLine, shape: "line" }
+    ], MARG.top + 8);
+
+    s += drawGrid(domain, 0, H_C1, function (v) { return fmtCompact(v); },
+      function (v) { return fmtCompact(v); }, crMax);
+
+    var ptLine = [];
+    for (var k = 1; k <= n; k++) {
+      var y = yearly[k - 1];
+      var cx = xCenter(n, k);
+      var xL = cx - barW / 2;
+      var cum = 0;
+      var parts = [
+        { v: y.capital || 0, c: COLORS.capital, t: "capital remboursé" },
+        { v: y.interest || 0, c: COLORS.interest, t: "intérêts" },
+        { v: y.insurance || 0, c: COLORS.insurance, t: "assurance" }
+      ];
+      for (var j = 0; j < parts.length; j++) {
+        var v = parts[j].v;
+        var yTopBar = y0 - ((cum + v) / domain.hi) * (y0 - MARG.top) + (0 - domain.lo) * 0;
+        var yBotBar = y0 - (cum / domain.hi) * (y0 - MARG.top);
+        s += rectEl(xL, yTopBar, barW, yBotBar - yTopBar, parts[j].c,
+          { title: "Année " + k + " — " + parts[j].t + " : " + Math.round(v).toLocaleString("fr-FR") + " XPF" });
+        cum += v;
+      }
+      var yr = y0 - ((y.crEnd || 0) / crMax) * (y0 - MARG.top);
+      ptLine.push(cx.toFixed(1) + "," + yr.toFixed(1));
+      var tt = rectEl(cx - barW / 2, MARG.top, barW, y0 - MARG.top, "transparent",
+        { title: "Année " + k + " — capital : " + Math.round(y.capital).toLocaleString("fr-FR") +
+          " · intérêts : " + Math.round(y.interest).toLocaleString("fr-FR") +
+          " · assurance : " + Math.round(y.insurance).toLocaleString("fr-FR") +
+          " · CR fin d'année : " + Math.round(y.crEnd).toLocaleString("fr-FR") + " XPF" });
+      s += tt;
+    }
+    s += polylineEl(ptLine.join(" "), COLORS.crLine, { w: 2 });
+    s += xAxisYears(n, 0, H_C1);
+    s += "<!-- CR max : " + crMax + " -->";
+    s += "</svg>";
+    host.innerHTML = s;
+  }
+
+  /* ================================================================
+   * Graphique 2 — qui paie quoi
+   * ================================================================ */
+  function computePayerSeries(result) {
+    /* CALCULS.md §8 : locataire = recettes (loyer + charges rétrocédées)
+     * annuelles ; reste à charge = max(0, - cash-flow annuel) ;
+     * cumuls année par année. */
+    var yearly = result.yearly || [];
+    var rows = [];
+    var cumLoc = 0, cumPerso = 0;
+    for (var k = 0; k < yearly.length; k++) {
+      var y = yearly[k];
+      var loc = Math.max(0, y.recettes || 0);
+      var rac = Math.max(0, -(y.cashFlow || 0));
+      cumLoc += loc;
+      cumPerso += rac;
+      rows.push({
+        year: y.year,
+        locataire: loc,
+        racharge: rac,
+        cumulLoc: cumLoc,
+        cumulPerso: cumPerso
+      });
+    }
+    return rows;
+  }
+
+  function renderChart2(result) {
+    var host = el("chart2");
+    if (!host) return;
+    var rows = computePayerSeries(result);
+    if (!rows.length) {
+      host.innerHTML = '<div class="chart-empty">Renseignez le financement pour afficher la répartition locataire / propriétaire.</div>';
+      return;
+    }
+
+    var n = rows.length;
+    var maxAnnuel = 0, maxCumul = 0;
+    for (var i = 0; i < n; i++) {
+      if (rows[i].locataire > maxAnnuel) maxAnnuel = rows[i].locataire;
+      if (rows[i].racharge > maxAnnuel) maxAnnuel = rows[i].racharge;
+      if (rows[i].cumulLoc > maxCumul) maxCumul = rows[i].cumulLoc;
+      if (rows[i].cumulPerso > maxCumul) maxCumul = rows[i].cumulPerso;
+    }
+    var domain = { lo: 0, hi: niceCeil(maxAnnuel) };
+    var cumMax = niceCeil(maxCumul);
+
+    var y0 = 0 + H_C2 - MARG.bottom;
+    var barW = Math.max(3, Math.floor(xStep(n) * 0.62 / 2) - 2);
+
+    var s = svgOpen(W, H_C2);
+    s += legendEl([
+      { label: "payé par le locataire (annuel)", color: COLORS.locataire },
+      { label: "reste à charge (annuel)", color: COLORS.racharge },
+      { label: "cumul locataire", color: COLORS.locataire, shape: "line" },
+      { label: "cumul reste à charge", color: COLORS.racharge, shape: "line" }
+    ], MARG.top + 8);
+
+    s += drawGrid(domain, 0, H_C2, function (v) { return fmtCompact(v); },
+      function (v) { return fmtCompact(v); }, cumMax);
+
+    var ptCumLoc = [];
+    var ptCumPerso = [];
+    for (var k = 1; k <= n; k++) {
+      var r = rows[k - 1];
+      var cx = xCenter(n, k);
+      var xL1 = cx - barW - 1;
+      var xL2 = cx + 1;
+      var h1 = ((r.locataire - domain.lo) / (domain.hi - domain.lo)) * (y0 - MARG.top);
+      var h2 = ((r.racharge - domain.lo) / (domain.hi - domain.lo)) * (y0 - MARG.top);
+      s += rectEl(xL1, y0 - h1, barW, h1, COLORS.locataire,
+        { title: "Année " + k + " — locataire : " + Math.round(r.locataire).toLocaleString("fr-FR") + " XPF" });
+      s += rectEl(xL2, y0 - h2, barW, h2, COLORS.racharge,
+        { title: "Année " + k + " — reste à charge : " + Math.round(r.racharge).toLocaleString("fr-FR") + " XPF" });
+      ptCumLoc.push(cx.toFixed(1) + "," + yFromVal(r.cumulLoc, { lo: 0, hi: cumMax }, 0, H_C2).toFixed(1));
+      ptCumPerso.push(cx.toFixed(1) + "," + yFromVal(r.cumulPerso, { lo: 0, hi: cumMax }, 0, H_C2).toFixed(1));
+    }
+    s += polylineEl(ptCumLoc.join(" "), COLORS.locataire, { w: 2, opacity: 0.9 });
+    s += polylineEl(ptCumPerso.join(" "), COLORS.racharge, { w: 2, opacity: 0.9 });
+    s += xAxisYears(n, 0, H_C2);
+    s += textEl(W - MARG.right - 4, MARG.top + 4, "échelle cumuls →", { anchor: "end", size: 10, fill: DATE_GREY });
+    s += "</svg>";
+    host.innerHTML = s;
+  }
+
+  /* ================================================================
+   * Graphique 3 — profil TRI / multiple selon la durée de détention
+   * ================================================================ */
+  function buildTriProfile(base) {
+    var p = base.p;
+    var rp0 = base.rp;
+    var simYearsOpt = B2.SIM_YEARS || 30;
+    var loanYearsEff = Math.round((base.loan.months || 0) / 12) || 0;
+    var capYears = Math.max(1, simYearsOpt);   /* profil complet sur l'horizon 30 ans */
+    var profile = [];
+    for (var N = 1; N <= capYears; N++) {
+      var rp = {};
+      for (var key in rp0) if (Object.prototype.hasOwnProperty.call(rp0, key)) rp[key] = rp0[key];
+      rp.holdingYears = N;
+      var res = B3.computeScenario(p, rp);
+      profile.push({
+        years: N,
+        irr: res.tri.irr,
+        multiple: res.tri.multiple
+      });
+    }
+    return profile;
+  }
+
+  function renderChart3(result) {
+    var host = el("chart3");
+    if (!host) return;
+    var profile;
+    try {
+      profile = buildTriProfile(result);
+    } catch (e) {
+      host.innerHTML = '<div class="chart-empty">Calcul du profil TRI indisponible : ' + escXml(String(e && e.message)) + "</div>";
+      return;
+    }
+    var withIrr = [];
+    var withMult = [];
+    for (var i = 0; i < profile.length; i++) {
+      if (profile[i].irr != null && isFinite(profile[i].irr)) withIrr.push(profile[i]);
+      if (profile[i].multiple != null && isFinite(profile[i].multiple)) withMult.push(profile[i]);
+    }
+    if (!withIrr.length && !withMult.length) {
+      host.innerHTML = '<div class="chart-empty">TRI non calculable (investissement initial nul ou flux sans changement de signe) — complètez la saisie.</div>';
+      return;
+    }
+
+    var maxIrr = -Infinity, minIrr = 0;
+    var maxMult = -Infinity;
+    for (var j = 0; j < profile.length; j++) {
+      var it = profile[j];
+      if (it.irr != null && isFinite(it.irr)) {
+        if (it.irr > maxIrr) maxIrr = it.irr;
+        if (it.irr < minIrr) minIrr = it.irr;
+      }
+      if (it.multiple != null && isFinite(it.multiple) && it.multiple > maxMult) maxMult = it.multiple;
+    }
+    if (!isFinite(maxIrr)) maxIrr = 0.01;
+    if (!isFinite(maxMult)) maxMult = 1;
+    var domain = { lo: niceFloor(minIrr - (maxIrr - Math.max(0, minIrr)) * 0.06), hi: niceCeil(maxIrr * 1.06) };
+    if (domain.hi <= domain.lo) domain.hi = domain.lo + 0.01;
+    var multMax = niceCeil(maxMult * 1.05);
+
+    var n = profile.length;
+
+    var s = svgOpen(W, H_C3);
+    s += legendEl([
+      { label: "TRI (axe gauche)", color: COLORS.tri, shape: "line" },
+      { label: "multiple d'argent investi (axe droit)", color: COLORS.multiple, shape: "line" }
+    ], MARG.top + 8);
+
+    s += drawGrid(domain, 0, H_C3,
+      function (v) { return fmtPctShort(v); },
+      function (v) { return fmtNum2(v); }, multMax);
+
+    var irrPts = [];
+    var multPts = [];
+    var resaleMarker = null;
+    for (var k = 0; k < n; k++) {
+      var it2 = profile[k];
+      var cx = xCenter(n, it2.years);
+      if (it2.irr != null && isFinite(it2.irr)) {
+        var yv = yFromVal(it2.irr, domain, 0, H_C3);
+        irrPts.push(cx.toFixed(1) + "," + yv.toFixed(1));
+        s += dotEl(cx, yv, COLORS.tri,
+          "Durée " + it2.years + " an(s) — TRI : " + fmtPctShort(it2.irr));
+      }
+      if (it2.multiple != null && isFinite(it2.multiple)) {
+        var ym = yFromVal(it2.multiple, { lo: 0, hi: multMax }, 0, H_C3);
+        multPts.push(cx.toFixed(1) + "," + ym.toFixed(1));
+        s += dotEl(cx, ym, COLORS.multiple,
+          "Durée " + it2.years + " an(s) — multiple : " + fmtNum2(it2.multiple) + "×");
+      }
+    }
+    if (result.rp && result.rp.holdingYears >= 1 && result.rp.holdingYears <= n) {
+      resaleMarker = result.rp.holdingYears;
+    }
+    if (resaleMarker) {
+      var mx = xCenter(n, resaleMarker);
+      s += lineEl(mx, MARG.top, mx, 0 + H_C3 - MARG.bottom, "#e06c75", { w: 1, dash: "4 3", opacity: 0.8 });
+      s += textEl(mx + 4, MARG.top + 12, "revente retenue : " + resaleMarker + " an" + (resaleMarker > 1 ? "s" : ""),
+        { size: 10, fill: "#e06c75" });
+    }
+    s += polylineEl(irrPts.join(" "), COLORS.tri, { w: 2.5 });
+    s += polylineEl(multPts.join(" "), COLORS.multiple, { w: 2 });
+    s += xAxisYears(n, 0, H_C3);
+    s += "</svg>";
+    host.innerHTML = s;
+  }
+
+  /* ================================================================
+   * Orchestration
+   * ================================================================ */
+  function refresh4() {
+    var result = B3.computeAllScenario();
+    renderChart1(result);
+    renderChart2(result);
+    renderChart3(result);
+    return result;
+  }
+
+  var form = document.getElementById("form-saisie");
+  if (form) {
+    form.addEventListener("input", refresh4);
+    form.addEventListener("change", refresh4);
+  }
+  var btnEffacer = el("btn-effacer");
+  if (btnEffacer) {
+    btnEffacer.addEventListener("click", function () { setTimeout(refresh4, 0); });
+  }
+
+    /* Premier rendu (après restauration localStorage + rendu bloc 2/3).
+   * Le bloc 4 est le dernier : on re-rafraîchit le bloc 3 pour que la
+   * table annuelle (colonnes "cash/gain si revente") et le badge
+   * revente soient (re)dessinés — le premier rendu du bloc 2 a tourné
+   * avant l'existence du module bloc 3. */
+  refresh4();
+  if (B2 && typeof B2.renderTable === "function" && B3 && typeof B3.refresh === "function") {
+    try { B3.refresh(); } catch (e) { /* badges absents mais table correcte */ }
+  }
+
+  /* Exposé pour vérification manuelle / console du navigateur. */
+  window.RentaInvestBloc4 = {
+    refresh: refresh4,
+    computePayerSeries: computePayerSeries,
+    buildTriProfile: buildTriProfile
+  };
+})();
+</script>
+<script>
+/* ================================================================
+ * Renta Invest Immo — BLOC 5 : fiche PDF (@media print)
+ * ----------------------------------------------------------------
+ * Ajout isolé : ne modifie pas blocs 1-4.
+ * - Bouton "Exporter fiche PDF" → construit la fiche (dont clones
+ *   des graphiques 1 et 2 déjà générés par le bloc 4) puis
+ *   window.print() (Ctrl+P → "Enregistrer en PDF").
+ * - CSS @media print masque la saisie/dasboard/graphes écran et
+ *   n'imprime QUE la fiche, fond blanc.
+ * Contenu : en-tête bien, indicateurs clés, scénario de revente,
+ * graphiques 1 & 2, tableau annuel condensé (13 colonnes, format k),
+ * référence de l'option / commentaire.
+ * ================================================================ */
+(function () {
+  "use strict";
+
+  var B2 = window.RentaInvestBloc2;
+  var B3 = window.RentaInvestBloc3;
+  var B4 = window.RentaInvestBloc4;
+  if (!B2 || !B3 || !B4) return;
+
+  function el(id) { return document.getElementById(id); }
+  function escXml(s) {
+    return String(s)
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">");
+  }
+  function formatXPF(n) {
+    if (n == null || !isFinite(n)) return "—";
+    var neg = n < 0;
+    var s = String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s + " XPF";
+  }
+  function formatK(n) {
+    if (n == null || !isFinite(n)) return "—";
+    var neg = n < 0;
+    var s = String(Math.round(Math.abs(n) / 1000)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return (neg ? "-" : "") + s;
+  }
+  function fmtPct(ratio, decimals) {
+    if (ratio == null || !isFinite(ratio)) return "—";
+    return (ratio * 100).toFixed(decimals == null ? 2 : decimals).replace(".", ",") + " %";
+  }
+  function fmtMult(n) {
+    if (n == null || !isFinite(n)) return "—";
+    return n.toFixed(2).replace(".", ",") + " ×";
+  }
+  function val(id) {
+    var n = el(id);
+    return n ? n.value : "";
+  }
+
+  /* Compose la fiche complète dans #fiche */
+  function refreshFiche() {
+    var host = el("fiche");
+    if (!host) return;
+    var s = B3.computeAllScenario();
+    var p = s.p, rp = s.rp, lr = s.loan;
+    var res = s.resale, t = s.tri;
+
+    /* --- en-tête bien --- */
+    var h = "";
+    h += '<div class="fiche-title">Renta Invest Immo — Fiche investissement</div>';
+    h += '<div class="fiche-sub">' +
+      escXml(val("bien_adresse") || "Bien non nommé") + " · " +
+      escXml(val("bien_type")) +
+      " · construit en " + escXml(val("bien_annee") || "—") +
+      " · " + (parseFloat(val("bien_surface_habitable")) || 0) + " m² habitables" +
+      (parseFloat(val("bien_surface_annexes")) > 0 ? " + " + val("bien_surface_annexes") + " m² annexes" : "") +
+      " · " + (p.prixM2 != null ? Math.round(p.prixM2) : 0) + " XPF/m²" +
+      "</div>";
+
+    /* --- indicateurs clés --- */
+    h += '<div class="fiche-h2">Indicateurs clés</div>';
+    h += '<div class="fiche-cards">';
+    var B2c = B2.computeAll();
+    var m = B2c.metrics;
+    var kpis = [
+      ["Prix d'achat FAI", formatXPF(p.priceFAI)],
+      ["Frais de notaire", formatXPF(p.fraisNotaire)],
+      ["Montant emprunté", formatXPF(p.capital) + " · " + p.years + " ans @ " + p.annualRatePct + " %"],
+      ["Mensualité crédit", formatXPF(lr.monthlyPayment)],
+      ["Mensualité totale", formatXPF(lr.totalMonthly) + " (assurance incluse)"],
+      ["Coût total du crédit", formatXPF(lr.totalCost)],
+      ["Rendement brut", fmtPct(m.rendementBrut)],
+      ["Rendement net avant dette", fmtPct(m.rendementNetAvantDette)],
+      ["Cash-flow mensuel moyen", formatXPF(m.cashFlowMensuelMoyen) + "/mois"],
+      ["Argent investi (initial)", formatXPF(res.initialInvest)]
+    ];
+    for (var k = 0; k < kpis.length; k++) {
+      h += '<div class="fiche-card"><div class="fl">' +
+        escXml(kpis[k][0]) + '</div><div class="fv">' +
+        escXml(kpis[k][1]) + "</div></div>";
+    }
+    h += "</div>";
+
+    /* --- scénario de revente --- */
+    h += '<div class="fiche-h2">Scénario de revente — fin d\'année ' + res.holdingYears + '</div>';
+    var readonly_mode = rp.modePrix === "montant" ? "montant saisi"
+      : rp.modePrix === "pourcentage" ? "prix FAI × (1 + " + fmtPct((rp.evolutionPct || 0) / 100, 1) + ")^" + res.holdingYears
+      : "prix d'achat FAI";
+    h += '<div class="fiche-line">Prix de revente (' + escXml(readonly_mode) + ') : <strong>'
+      + formatXPF(res.salePrice) + "</strong></div>";
+    h += '<div class="fiche-line">Frais de vente agence (' + rp.fraisVentePct + " %) : "
+      + formatXPF(res.saleFees) + "</div>";
+    h += '<div class="fiche-line">Capital restant dû (CR) : ' + formatXPF(res.crN) + "</div>";
+    h += '<div class="fiche-line">Plus-value brute : ' + formatXPF(res.capitalGainGross)
+      + " · Impôt PV (" + rp.taxPVPct + " %) : " + formatXPF(res.taxPV)
+      + " · Net d'impôt : " + formatXPF(res.capitalGainNet) + "</div>";
+    h += '<div class="fiche-line">Cash encaissé à la revente : <strong>'
+      + formatXPF(res.resaleCashFlow) + "</strong></div>";
+    var atN = B3.resaleAt(res.holdingYears, p, lr, s.yearly, rp);
+    h += '<div class="fiche-line">Gain / perte total du projet (cash revente + cumul exploitation) : <strong>'
+      + formatXPF(atN.totalGainIfSold)
+      + "</strong> · TRI : <strong>" + fmtPct(t.irr) +
+      "</strong> · Multiple : <strong>" + fmtMult(t.multiple) + "</strong></div>";
+
+    /* --- graphiques 1 & 2 (clones du bloc 4) --- */
+    var c1 = el("chart1"), c2 = el("chart2");
+    var s1 = c1 ? c1.querySelector("svg") : null;
+    var s2 = c2 ? c2.querySelector("svg") : null;
+    if (s1) h += '<div class="fiche-h2">Amortissement annuel</div>'
+      + '<div class="fiche-svg-wrap">' + s1.outerHTML + "</div>";
+    if (s2) h += '<div class="fiche-h2">Qui paie quoi — locataire vs reste à charge</div>'
+      + '<div class="fiche-svg-wrap">' + s2.outerHTML + "</div>";
+
+    /* --- tableau annuel condensé (format k) --- */
+    h += '<div class="fiche-h2">Tableau annuel condensé (montants en k XPF)</div>';
+    var yearly = s.yearly;
+    h += '<table class="fiche-table"><thead><tr>' +
+      "<th>Année</th><th>Capital</th><th>Intérêts</th><th>Assurance</th>" +
+      "<th>Recettes</th><th>Charges</th><th>Impôt</th><th>Cash-flow</th>" +
+      "<th>Capital restant</th><th>Investi</th><th>Cash revente</th>" +
+      "<th>Gain / perte</th><th>Multiple</th>" +
+      "</tr></thead><tbody>";
+    var tot = { c: 0, i: 0, a: 0, r: 0, ch: 0, im: 0, cf: 0 };
+    for (var y = 0; y < yearly.length; y++) {
+      var yr = yearly[y];
+      tot.c += yr.capital; tot.i += yr.interest; tot.a += yr.insurance;
+      tot.r += yr.recettes; tot.ch += yr.charges; tot.im += yr.impot; tot.cf += yr.cashFlow;
+      /* colonnes revente : calcul par année via resaleAt (bloc 3) */
+      var at = B3.resaleAt(yr.year, p, lr, yearly, rp);
+      var invK = "", cashK = "", gainK = "", multK = "";
+      if (at) {
+        invK = formatK(at.argentInvesti);
+        cashK = formatK(at.cashAtResale);
+        gainK = formatK(at.totalGainIfSold);
+        multK = at.multiple == null ? "—" : fmtMult(at.multiple);
+      }
+      var cls = (yr["cashFlow"] < 0 ? " class=\"neg\"" : "");
+      h += "<tr" + (yr.year === res.holdingYears ? ' class="row-revente"' : "") + ">" +
+        "<td>" + yr.year + "</td>" +
+        "<td>" + formatK(yr.capital) + "</td>" +
+        "<td>" + formatK(yr.interest) + "</td>" +
+        "<td>" + formatK(yr.insurance) + "</td>" +
+        "<td>" + formatK(yr.recettes) + "</td>" +
+        "<td>" + formatK(yr.charges) + "</td>" +
+        '<td' + cls + '>' + formatK(yr.impot) + "</td>" +
+        '<td' + cls + '>' + formatK(yr.cashFlow) + "</td>" +
+        "<td>" + formatK(yr.crEnd) + "</td>" +
+        "<td>" + invK + "</td>" +
+        "<td>" + cashK + "</td>" +
+        "<td>" + gainK + "</td>" +
+        "<td>" + multK + "</td>" +
+        "</tr>";
+    }
+    h += '<tr class="total-row"><td>Total</td>' +
+      "<td>" + formatK(tot.c) + "</td>" +
+      "<td>" + formatK(tot.i) + "</td>" +
+      "<td>" + formatK(tot.a) + "</td>" +
+      "<td>" + formatK(tot.r) + "</td>" +
+      "<td>" + formatK(tot.ch) + "</td>" +
+      "<td>" + formatK(tot.im) + "</td>" +
+      "<td>" + formatK(tot.cf) + "</td>" +
+      "<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>" +
+      "</tr></tbody></table>";
+
+    /* --- référence option / commentaire --- */
+    var ref = val("ref_commentaire");
+    if (ref && ref.trim()) {
+      h += '<div class="fiche-ref"><strong>Référence option / commentaire :</strong> '
+        + escXml(ref) + "</div>";
+    }
+
+    host.innerHTML = h;
+    return s;
+  }
+
+  /* Bouton Exporter : reconstruire la fiche (les graphiques peuvent
+   * avoir été re-rendus), puis lancer l'impression. */
+  var btn = el("btn-pdf");
+  if (btn) {
+    btn.addEventListener("click", function () {
+      refreshFiche();
+      window.print();
+    });
+  }
+
+  /* Fiche déjà prête au chargement (édition Ctrl+P directe possible). */
+  refreshFiche();
+
+  /* Exposé pour vérification manuelle / console. */
+  window.RentaInvestBloc5 = {
+    refresh: refreshFiche
+  };
+})();
+</script>
+
+</body>
+</html>
