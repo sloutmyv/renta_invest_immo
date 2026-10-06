@@ -828,12 +828,38 @@
               <span class="suffix">%</span>
             </div>
           </div>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="rev_pvi_mode">Taxe plus-value immobilière (PVI NC)</label>
+            <select id="rev_pvi_mode">
+              <option value="reel" selected>PVI NC réelle — 20 % + CCS 4 % (abattement 10 %/an &gt; 10 ans, exonéré à 20 ans)</option>
+              <option value="taux_fixe">Taux fixe manuel (hérité)</option>
+              <option value="exonere">Exonéré (résidence principale)</option>
+            </select>
+            <div class="hint">Simplifie l'impôt sur la plus-value : le mode réel applique le régime NC (taux 24 %, abattement progressif après 10 ans, exonération à 20 ans).</div>
+          </div>
           <div class="field">
-            <label for="rev_taux_plus_value">Taux d'imposition plus-value</label>
+            <label for="rev_taux_plus_value">Taux d'imposition plus-value (si mode "taux fixe")</label>
             <div class="input-suffix">
               <input type="number" id="rev_taux_plus_value" min="0" max="100" step="0.1" value="0">
               <span class="suffix">%</span>
             </div>
+            <div class="hint">Utilisé uniquement en mode "taux fixe".</div>
+          </div>
+          <div class="field">
+            <label for="rev_frais_acquisition_add">Frais d'acquisition réels (majoration base PVI)</label>
+            <div class="input-suffix">
+              <input type="text" id="rev_frais_acquisition_add" data-xpf inputmode="numeric" placeholder="0" value="0">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">Travaux / frais retenus (facturés) ajoutés au prix d'acquisition pour réduire la plus-value imposable. Sinon forfait 15 % de 2 ans+ si aucun justificatif.</div>
+          </div>
+          <div class="field" id="field_rev_forfait_frais">
+            <label for="rev_forfait_frais_pvi">Forfait frais d'acquisition (si pas de factures)</label>
+            <div class="input-suffix">
+              <input type="number" id="rev_forfait_frais_pvi" min="0" max="30" step="0.5" value="15">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Applicable seulement à partir de 2 ans de détention (sinon 0 forfait ici).</div>
           </div>
         </div>
         <div class="doc-note">Scénario NC : détention 15 ans, marché +1 %/an, frais d'agence 4 %, plus-value 0 % (exonération indicielle simplifiée).</div>
@@ -931,7 +957,10 @@
     rev_mode_prix: "achat",
     rev_evolution: "1",
     rev_frais_vente: "4",
-    rev_taux_plus_value: "0"
+    rev_taux_plus_value: "0",
+    rev_pvi_mode: "reel",
+    rev_frais_acquisition_add: 0,
+    rev_forfait_frais_pvi: "15"
   };
   var DEFAULT_ASSURANCE_MODE = "pct";
 
@@ -1934,7 +1963,31 @@
       var crN = (N > 0 && N <= loanYears) ? loanResult.years[N - 1].crEnd : 0;
 
       var capitalGainGross = salePrice - saleFees - prixFAI;
-      var taxPV = (((rp && rp.taxPVPct) || 0) / 100) * Math.max(0, capitalGainGross);
+
+      /* --- V1.2 : PVI NC réelle (taux 24 % total, abattement 10 %/an après 10 ans, exonéré à 20 ans) --- */
+      var pviMode = (rp && rp.pviMode) || "reel";
+      var taxPV;
+      if (pviMode === "exonere") {
+        taxPV = 0;
+      } else if (pviMode === "taux_fixe") {
+        taxPV = (((rp && rp.taxPVPct) || 0) / 100) * Math.max(0, capitalGainGross);
+      } else {
+        /* régime réel NC : base = prix de cession − prix d'acquisition − frais réels (ou forfait 15 % dès 2 ans) − frais de vente */
+        var fraisAcqReels = ((rp && rp.fraisAcqSupp) || 0);
+        var notaireEtTravaux = ((p && p.fraisNotaire) || 0) + ((p && p.travaux) || 0);
+        var fraisFormationBase;
+        if (N >= 2 && fraisAcqReels === 0 && notaireEtTravaux === 0) {
+          /* forfait 15 % si aucune facture et ≥ 2 ans de détention */
+          fraisFormationBase = salePrice * (((rp && rp.forfaitFraisPct) || 15) / 100);
+        } else {
+          fraisFormationBase = fraisAcqReels + notaireEtTravaux;
+        }
+        var pviBrute = Math.max(0, salePrice - prixFAI - fraisFormationBase);
+        var abattement = (N > 10) ? Math.min(100, (N - 10) * 10) : 0;
+        var pviNette = pviBrute * (1 - abattement / 100);
+        var PVI_TAUX = 0.20, CCS_TAUX = 0.04;
+        taxPV = pviNette * (PVI_TAUX + CCS_TAUX);
+      }
       var capitalGainNet = capitalGainGross - taxPV;
       var resaleCashFlow = salePrice - saleFees - crN - taxPV;
 
@@ -2135,7 +2188,10 @@
       evolutionPct: valNum("rev_evolution"),
       holdingYears: valNum("rev_duree_detention"),
       fraisVentePct: valNum("rev_frais_vente"),
-      taxPVPct: valNum("rev_taux_plus_value")
+      taxPVPct: valNum("rev_taux_plus_value"),
+      pviMode: valSelect("rev_pvi_mode") || "reel",
+      fraisAcqSupp: valXPF("rev_frais_acquisition_add"),
+      forfaitFraisPct: valNum("rev_forfait_frais_pvi")
     };
   }
 
