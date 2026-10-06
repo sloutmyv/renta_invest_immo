@@ -444,6 +444,28 @@
       </div>
       <div class="calc-preview" id="dash-footnote">Le tableau se recalcule à chaque modification de la saisie. Scénario de revente &amp; TRI&nbsp;: bloc&nbsp;3.</div>
     </div>
+
+    <!-- ==== V1.2 : COMPARATIF FISCAL DES 4 RÉGIMES ==== -->
+    <div class="annual-wrap" id="fiscal-compare-block">
+      <h3>Comparatif fiscal des régimes (m&ecirc;me bien, m&ecirc;me financement)</h3>
+      <div class="table-scroll">
+        <table class="annual" id="fiscal-table">
+          <thead>
+            <tr>
+              <th>Régime</th>
+              <th>Résultat imposable (an 1)</th>
+              <th>Impôt an 1</th>
+              <th>CCS an 1</th>
+              <th>Impôt + CCS / an (moy.)</th>
+              <th>Total impôt sur 15 ans</th>
+              <th>Cash-flow moyen/mois</th>
+            </tr>
+          </thead>
+          <tbody id="fiscal-body"></tbody>
+        </table>
+      </div>
+      <div class="calc-preview">Les 4 régimes sont simulés avec les m&ecirc;mes recettes / charges / cr&eacute;dit. Le mode retenu dans <em>Fiscalité</em> pilote le tableau annuel ci-dessus ; cette comparaison reste indicative.</div>
+    </div>
   </section>
 
   <!-- ============ BLOC 4 : VISUELS SVG ============ -->
@@ -717,16 +739,50 @@
       <summary>Fiscalité</summary>
       <div class="section-body">
         <div class="grid">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="fisc_mode">Mode de détention / gestion</label>
+            <select id="fisc_mode">
+              <option value="nue" selected>Nom propre — location nue (fonciers)</option>
+              <option value="meuble_forfait">Nom propre — location meublée — forfait 50 %</option>
+              <option value="meuble_reel">Nom propre — location meublée — réel (avec amortissement)</option>
+              <option value="sci_transparente">SCI transparente — quote-part d'associé (fonciers)</option>
+            </select>
+            <div class="hint">Remplace le taux fixe ; le régime conditionne les charges déductibles et le calcul de l'impôt (voir comparatif sous le tableau de bord).</div>
+          </div>
           <div class="field">
-            <label for="fisc_taux">Taux d'imposition résultat locatif</label>
+            <label for="fisc_part_associe">Quote-part associé (SCI uniquement)</label>
             <div class="input-suffix">
-              <input type="number" id="fisc_taux" min="0" max="100" step="0.1" value="25">
+              <input type="number" id="fisc_part_associe" min="1" max="100" step="1" value="100">
               <span class="suffix">%</span>
             </div>
-            <div class="hint">Taux simple appliqué au résultat annuel (0 par défaut).</div>
+            <div class="hint">Part du résultat attribuée à TOI dans la SCI (le reste aux autres associés — hors explication).</div>
+          </div>
+          <div class="field">
+            <label for="fisc_ccs_taux">CCS (contribution calédonienne de solidarité)</label>
+            <div class="input-suffix">
+              <input type="number" id="fisc_ccs_taux" min="0" max="20" step="0.1" value="4">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">S'applique au net foncier / BIC réel (dès le 1ᵉʳ franc). Défaut 4 % (NC depuis 2023).</div>
+          </div>
+          <div class="field" id="field-fisc-amort-duree">
+            <label for="fisc_amort_duree">Durée d'amortissement (meublé réel)</label>
+            <div class="input-suffix">
+              <input type="number" id="fisc_amort_duree" min="5" max="50" step="1" value="25">
+              <span class="suffix">ans</span>
+            </div>
+            <div class="hint">Linéaire sur le prix de construction : 100 000 / durée / an (déduit du résultat).</div>
+          </div>
+          <div class="field">
+            <label for="fisc_ir_marginal">Tranche marginale IRNC (nom propre / SCI)</label>
+            <div class="input-suffix">
+              <input type="number" id="fisc_ir_marginal" min="0" max="60" step="1" value="25">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Taux marginal du barème IRNC appliqué au résultat (forfait fixé par toi, pas de grille complète).</div>
           </div>
         </div>
-        <div class="doc-note">Taux indicatif NC 25 % appliqué au résultat locatif (taux simple, sans barème complet).</div>
+        <div class="doc-note">Le taux fixe unique est remplacé par 4 modes de gestion. Impôt et CCS calculés par année, détaillés dans le tableau de comparaison sous le tableau de bord.</div>
       </div>
     </details>
 
@@ -866,7 +922,11 @@
     chg_taxe_fonciere: 45000,
     chg_pno: 35000,
     chg_entretien: "5",
-    fisc_taux: "25",
+    fisc_mode: "nue",
+    fisc_part_associe: "100",
+    fisc_ccs_taux: "4",
+    fisc_amort_duree: "25",
+    fisc_ir_marginal: "25",
     rev_duree_detention: "15",
     rev_mode_prix: "achat",
     rev_evolution: "1",
@@ -1084,6 +1144,12 @@
     return node ? parseXPF(node.value) : 0;
   }
 
+  /** Valeur brute (string) d'un champ / select. */
+  function val(id) {
+    var node = el(id);
+    return node ? node.value : "";
+  }
+
   /** Valeur sélectionnée d'un groupe de boutons radio. */
   function valRadio(name) {
     var r = form.querySelector('input[name="' + name + '"]:checked');
@@ -1193,6 +1259,7 @@
      */
     build: function (p, loanResult) {
       var nYears = SIM_YEARS;   // horizon étendu ; lignes crédit absentes → guard ci-dessous
+      var fiscal = window.RentaFisc || {};
       var out = [];
       var index = (p.indexationPct || 0) / 100;
       var vac = (p.vacancyPct || 0) / 100;
@@ -1215,7 +1282,23 @@
         var lr = loanResult.years[k - 1] || { interest: 0, insurance: 0, capital: 0, crEnd: 0 };
 
         var resultatImposable = loyerPercu - charges - lr.interest - lr.insurance;
-        var impot = (p.taxRatePct || 0) / 100 * Math.max(0, resultatImposable);
+
+        /* --- fiscalité V1.2 : module RentaFisc (gère montant, CCS et mode) --- */
+        var impot, ccs, netImposable;
+        var fiscMode = p.fiscMode || "nue";
+        var fnFiscal = (fiscal && fiscal.computeYear) ? fiscal.computeYear : null;
+        var FR = typeof fiscal !== "undefined" && fiscal ? fiscal : null;
+        if (fnFiscal) {
+          var f = fnFiscal(fiscMode, resultatImposable, k, p, loanResult);
+          impot = f.impot;
+          ccs = f.ccs;
+          netImposable = f.netImposable;
+        } else {
+          /* fallback si module absent : ancien taux fixe */
+          impot = (p.taxRatePct || 0) / 100 * Math.max(0, resultatImposable);
+          ccs = 0;
+          netImposable = resultatImposable;
+        }
 
         var creditAnnuel = (loanResult.years && k <= loanResult.years.length)
           ? (loanResult.monthlyPayment + loanResult.insuranceMonthly) * 12
@@ -1240,11 +1323,87 @@
           crEnd: lr.crEnd,
           resultatImposable: resultatImposable,
           impot: impot,
+          ccs: ccs,
+          netImposable: netImposable,
+          impotTotal: impot + ccs,
           creditAnnuel: creditAnnuel,
           cashFlow: cashFlow
         });
       }
       return out;
+    }
+  };
+
+  /* ================================================================
+   * Module fiscal — 4 régimes NC, V1.2
+   * ----------------------------------------------------------------
+   * Modes :
+   *   nue              → nom propre, location nue. Revenus fonciers :
+   *                      résultat = loyers − charges réelles − intérêts
+   *                      − assurance. IR marginal + CCS.
+   *   meuble_forfait   → LMNP forfait 50 %. Impôt = 50 % du loyer
+   *                      brut × taux marginal + CCS. Hors charges locatives.
+   *   meuble_reel      → LMNP réel : charges réelles + intérêts +
+   *                      assurance + amortissement linéaire du bien.
+   *                      Impôt = résultat × taux marginal + CCS.
+   *   sci_transparente → identique à « nue » mais appliqué sur la
+   *                      quote-part associé (75 % etc.).
+   *
+   * CCS 4 % s'applique toujours au NET imposable (V1.2).
+   * ================================================================ */
+  var fiscalModule = {
+    MODES: ["nue", "meuble_forfait", "meuble_reel", "sci_transparente"],
+
+    amort: function (p, k) {
+      /* amortissement linéaire du prix de construction = prix FAI (simplifié : mobilier non distinct en NC) */
+      var base = (p && p.priceFAI) || 0;
+      if (base <= 0) return 0;
+      var duree = Math.max(5, Math.min(50, valNum("fisc_amort_duree") || 25));
+      return base / duree;
+    },
+
+    computeYear: function (mode, resultatBrut, k, p, loanResult) {
+      var irMarginal = (valNum("fisc_ir_marginal") || 0) / 100;
+      var ccsTaux = (valNum("fisc_ccs_taux") || 0) / 100;
+      var part = Math.min(100, Math.max(1, valNum("fisc_part_associe") || 100)) / 100;
+
+      var impot = 0, ccs = 0, netImposable = 0;
+
+      if (mode === "meuble_forfait") {
+        /* forfait 50 % : on taxe la MOITIÉ des loyers bruts (hors loyer net de vacance,
+         * le modèle forfait NC considère les loyers bruts). Coût adapté.
+         * Le résultat brut ici correspond aux loyers − charges payées par le propriétaire
+         * (même base que la location nue), l'abattement 50 % s'applique ensuite. */
+        netImposable = Math.max(0, resultatBrut) * 0.5;
+        impot = netImposable * irMarginal;
+        ccs = netImposable * ccsTaux;
+      } else if (mode === "meuble_reel") {
+        var amort = fiscalModule.amort(p, k);
+        netImposable = Math.max(0, resultatBrut - amort);
+        impot = netImposable * irMarginal;
+        ccs = netImposable * ccsTaux;
+      } else if (mode === "sci_transparente") {
+        netImposable = Math.max(0, resultatBrut) * part;
+        impot = netImposable * irMarginal;
+        ccs = netImposable * ccsTaux;
+      } else {   /* nue par défaut */
+        netImposable = Math.max(0, resultatBrut);
+        impot = netImposable * irMarginal;
+        ccs = netImposable * ccsTaux;
+      }
+
+      return { impot: impot, ccs: ccs, netImposable: netImposable, impotTotal: impot + ccs };
+    },
+
+    /* Retourne le libellé du mode pour l'affichage */
+    label: function (mode) {
+      var labels = {
+        nue: "Nom propre — location nue (fonciers)",
+        meuble_forfait: "Nom propre — meublé forfait 50 %",
+        meuble_reel: "Nom propre — meublé réel (amortissement)",
+        sci_transparente: "SCI transparente (quote-part)"
+      };
+      return labels[mode] || labels.nue;
     }
   };
 
@@ -1335,7 +1494,11 @@
       taxeFonciereAnnual: valXPF("chg_taxe_fonciere"),
       pnoAnnual: valXPF("chg_pno"),
       entretienPct: valNum("chg_entretien"),
-      taxRatePct: valNum("fisc_taux")
+      taxRatePct: valNum("fisc_ir_marginal"),
+      fiscMode: val("fisc_mode") || "nue",
+      partAssocie: valNum("fisc_part_associe") || 100,
+      ccsTaux: valNum("fisc_ccs_taux") || 0,
+      amortDuree: valNum("fisc_amort_duree") || 25
     };
   }
 
@@ -1492,11 +1655,62 @@
     body.innerHTML = rows.join("");
   }
 
+  /* ================================================================
+   * Rendu V1.2 — comparatif fiscal des 4 régimes
+   * ================================================================ */
+  function renderFiscalCompare(result) {
+    var body = el("fiscal-body");
+    if (!body) return;
+    var fisc = window.RentaFisc || (window.RentaInvestBloc2 && window.RentaInvestBloc2.fiscal);
+    if (!fisc || !fisc.MODES) { body.innerHTML = ""; return; }
+
+    var pRes = result.params || result.p;
+    var lRes = result.loan;
+    var yRes = result.yearly;
+
+    var rows = [];
+    for (var mi = 0; mi < fisc.MODES.length; mi++) {
+      var mode = fisc.MODES[mi];
+      var pMode = Object.assign({}, pRes, { fiscMode: mode });
+      var lrMode = loan.build(pMode);
+      var yearlyMode = revenue.build(pMode, lrMode);
+
+      var totalImp = 0, totalCcs = 0, totalCash = 0, resAn1 = null, impAn1 = 0, ccsAn1 = 0;
+      for (var k = 0; k < yearlyMode.length; k++) {
+        var fy = yearlyMode[k];
+        var f = fisc.computeYear(mode, fy.resultatImposable, fy.year, pMode, lrMode);
+        if (fy.year === 1) { resAn1 = fy.resultatImposable; impAn1 = f.impot; ccsAn1 = f.ccs; }
+        if (fy.year <= 15) { totalImp += f.impot; totalCcs += f.ccs; }
+        var creditY = (lrMode.years && fy.year <= lrMode.years.length)
+          ? (lrMode.monthlyPayment + lrMode.insuranceMonthly) * 12
+          : 0;
+        totalCash += (fy.recettes - fy.charges - creditY - f.impot - f.ccs);
+      }
+      var n = yearlyMode.length;
+      var cfMoy = n > 0 ? totalCash / n / 12 : 0;
+      var impotMoy = n > 0 ? (totalImp + totalCcs) / 15 : 0;
+
+      var label = fisc.label(mode);
+      var isCurrent = (pRes.fiscMode === mode);
+      rows.push('<tr class="' + (isCurrent ? "row-revente" : "") + '">' +
+        "<td>" + label + (isCurrent ? ' <strong>(actif)</strong>' : "") + "</td>" +
+        "<td>" + (resAn1 == null ? "—" : formatK(resAn1)) + "</td>" +
+        "<td>" + formatK(impAn1) + "</td>" +
+        "<td>" + formatK(ccsAn1) + "</td>" +
+        "<td>" + formatK(impotMoy) + "</td>" +
+        "<td>" + formatK(totalImp + totalCcs) + "</td>" +
+        '<td class="' + (cfMoy < 0 ? "neg" : "pos") + '">' + formatK(cfMoy) + "</td>" +
+        "</tr>");
+    }
+    body.innerHTML = rows.join("");
+  }
+
   /** Recalcule et redessine tout le tableau de bord. */
   function refresh() {
     var result = computeAll();
     renderCards(result);
     renderTable(result);
+    try { renderFiscalCompare(result); } catch (e) { /* silencieux, comparatif non bloquant */ }
     return result;
   }
 
@@ -1603,10 +1817,12 @@
     loan: loan,
     revenue: revenue,
     metrics: metrics,
+    fiscal: fiscalModule,
     computeAll: computeAll,
     refresh: refresh,
     renderTable: renderTable
   };
+  window.RentaFisc = fiscalModule;
 })();
 </script>
 
