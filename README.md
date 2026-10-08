@@ -2,6 +2,14 @@
 
 Simulateur d'investissement locatif **100 % autonome** (un seul fichier `index.html`, aucune dépendance) — devise **XPF**, contexte Nouvelle-Calédonie.
 
+**Version 1.4** (08/10/2026) : ergonomie & cohérence —
+- part locataire **mensualisée** dans le tableau de bord,
+- **reste à charge mensuel calculé sur l'horizon de revente** (et non sur 30 ans),
+- **rendement net avant dette ramené au prix total d'acquisition** (prix FAI + notaire + travaux + frais de prêt) — la version sans frais reste affichée dans l'info,
+- section **Frais achat placée avant Financement** (ordre d'achat logique),
+- **vacance locative et gestion locative déplacées** dans le bloc *Charges propriétaire*,
+- **tooltips ⓘ** au survol de chaque colonne du comparatif fiscal des régimes (mode de calcul explicite).
+
 **Version 1.3** (05/10/2026) : **imposition à la revente (PVI NC réelle)** — le taux fixe de plus-value devient un **sélecteur du régime PVI** : réel NC (20 % IR-PVI + 4 % CCS = 24 %, abattement 10 %/an au-delà de 10 ans de détention, **exonération totale à 20 ans**), taux fixe manuel, ou exonéré (résidence principale). La base prend en compte les frais d'acquisition réels (notaire + travaux saisis) ou, à défaut de justificatifs, un forfait de 15 % du prix de vente dès 2 ans de détention. Le TRI et le multiple intègrent l'impôt à la revente.
 
 **Version 1.2** (05/10/2026) : **volet fiscalité NC** — le taux fixe 25 % est remplacé par un **sélecteur de régime** avec 4 modes (nom propre nue / meublé forfait 50 % / meublé réel amortissable / SCI transparente quote-part), champs CCS (4 %), tranche marginale IRNC, quote-part associé, durée d'amortissement. **Tableau comparatif des 4 régimes** (résultat imposable, impôt, CCS, impôt moyen/an, total sur 15 ans, cash-flow moyen/mois) ajouté sous le tableau annuel.

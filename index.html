@@ -453,12 +453,12 @@
           <thead>
             <tr>
               <th>Régime</th>
-              <th>Résultat imposable (an 1)</th>
-              <th>Impôt an 1</th>
-              <th>CCS an 1</th>
-              <th>Impôt + CCS / an (moy.)</th>
-              <th>Total impôt sur 15 ans</th>
-              <th>Cash-flow moyen/mois</th>
+              <th title="Résultat annuel an 1 : loyers − charges propriétaire − intérêts − assurance prêt (base avant régime fiscal)">Résultat imposable (an 1) ⓘ</th>
+              <th title="Impôt sur le revenu selon régime : nue/SCI → IRNC marginal × résultat ; meublé forfait → abattement 50 % puis IRNC ; meublé réel → IRNC × (résultat − amortissement)">Impôt an 1 ⓘ</th>
+              <th title="Contribution Calédonienne de Solidarité, 4 % (configurable) dès le 1ᵉʳ franc du net foncier/BIC réel">CCS an 1 ⓘ</th>
+              <th title="Moyenne annuelle de (impôt + CCS) sur les 15 premières années (durée de référence du comparatif)">Impôt + CCS / an (moy.) ⓘ</th>
+              <th title="Somme cumulée de l'impôt + CCS sur les 15 premières années de détention">Total impôt sur 15 ans ⓘ</th>
+              <th title="Cash-flow mensuel moyen = (recettes − charges − annuités crédit − impôt − CCS) / nombre d'années / 12">Cash-flow moyen/mois ⓘ</th>
             </tr>
           </thead>
           <tbody id="fiscal-body"></tbody>
@@ -543,6 +543,32 @@
       </div>
     </details>
 
+    <!-- ============ FRAIS ACHAT ============ -->
+    <details class="section" id="section-frais-achat">
+      <summary>Frais achat</summary>
+      <div class="section-body">
+        <div class="grid">
+          <div class="field">
+            <label for="achat_frais_notaire">Frais de notaire</label>
+            <div class="input-suffix">
+              <input type="text" id="achat_frais_notaire" data-xpf inputmode="numeric" placeholder="0" value="1 650 000">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">Saisie manuelle (pas de calcul automatique).</div>
+          </div>
+          <div class="field">
+            <label for="achat_travaux">Travaux (rénovation, aménagement)</label>
+            <div class="input-suffix">
+              <input type="text" id="achat_travaux" data-xpf inputmode="numeric" placeholder="0" value="0">
+              <span class="suffix">XPF</span>
+            </div>
+            <div class="hint">S'ajoute à l'investissement initial. Défaut 0 XPF.</div>
+          </div>
+        </div>
+        <div class="doc-note">Notaire NC ancien ≈11 % du prix (droits ~9,32 % + émoluments) → 1 650 000 XPF pour 15 000 000.</div>
+      </div>
+    </details>
+
     <!-- ============ FINANCEMENT ============ -->
     <details class="section" id="section-financement">
       <summary>Financement</summary>
@@ -624,32 +650,6 @@
       </div>
     </details>
 
-    <!-- ============ FRAIS ACHAT ============ -->
-    <details class="section" id="section-frais-achat">
-      <summary>Frais achat</summary>
-      <div class="section-body">
-        <div class="grid">
-          <div class="field">
-            <label for="achat_frais_notaire">Frais de notaire</label>
-            <div class="input-suffix">
-              <input type="text" id="achat_frais_notaire" data-xpf inputmode="numeric" placeholder="0" value="1 650 000">
-              <span class="suffix">XPF</span>
-            </div>
-            <div class="hint">Saisie manuelle (pas de calcul automatique).</div>
-          </div>
-          <div class="field">
-            <label for="achat_travaux">Travaux (rénovation, aménagement)</label>
-            <div class="input-suffix">
-              <input type="text" id="achat_travaux" data-xpf inputmode="numeric" placeholder="0" value="0">
-              <span class="suffix">XPF</span>
-            </div>
-            <div class="hint">S'ajoute à l'investissement initial. Défaut 0 XPF.</div>
-          </div>
-        </div>
-        <div class="doc-note">Notaire NC ancien ≈11 % du prix (droits ~9,32 % + émoluments) → 1 650 000 XPF pour 15 000 000.</div>
-      </div>
-    </details>
-
     <!-- ============ RECETTES ============ -->
     <details class="section" id="section-recettes">
       <summary>Recettes</summary>
@@ -675,20 +675,6 @@
             <div class="input-suffix">
               <input type="text" id="rec_charges_locatives" data-xpf inputmode="numeric" placeholder="0" value="5 000">
               <span class="suffix">XPF</span>
-            </div>
-          </div>
-          <div class="field">
-            <label for="rec_vacance">Vacance locative</label>
-            <div class="input-suffix">
-              <input type="number" id="rec_vacance" min="0" max="100" step="0.1" value="5">
-              <span class="suffix">%</span>
-            </div>
-          </div>
-          <div class="field">
-            <label for="rec_gestion">Gestion locative</label>
-            <div class="input-suffix">
-              <input type="number" id="rec_gestion" min="0" max="100" step="0.1" value="0">
-              <span class="suffix">% loyer</span>
             </div>
           </div>
         </div>
@@ -723,6 +709,21 @@
             </div>
           </div>
           <div class="field">
+            <label for="rec_vacance">Vacance locative</label>
+            <div class="input-suffix">
+              <input type="number" id="rec_vacance" min="0" max="100" step="0.1" value="5">
+              <span class="suffix">%</span>
+            </div>
+            <div class="hint">Période sans locataire (transition, travaux, vacance de marché).</div>
+          </div>
+          <div class="field">
+            <label for="rec_gestion">Gestion locative (agence)</label>
+            <div class="input-suffix">
+              <input type="number" id="rec_gestion" min="0" max="100" step="0.1" value="0">
+              <span class="suffix">% loyer</span>
+            </div>
+          </div>
+          <div class="field">
             <label for="chg_entretien">Entretien / travaux</label>
             <div class="input-suffix">
               <input type="number" id="chg_entretien" min="0" max="100" step="0.1" value="5">
@@ -730,7 +731,7 @@
             </div>
           </div>
         </div>
-        <div class="doc-note">Charges NC : copro 8 000/mois, taxe foncière 45 000/an (contribution foncière NC ≈8,4 % sur la valeur cadastrale construction), PNO 35 000/an, entretien 5 %.</div>
+        <div class="doc-note">Charges NC : copro 8 000/mois, taxe foncière 45 000/an (contribution foncière NC ≈8,4 % sur la valeur cadastrale construction), PNO 35 000/an, entretien 5 %, vacance type 5 %.</div>
       </div>
     </details>
 
@@ -1471,8 +1472,17 @@
       var loyerAnnuelHC = (p.rentMonthly || 0) * 12;
       var loyerPercu = loyerAnnuelHC * (1 - (p.vacancyPct || 0) / 100);
 
+      /* V1.4 : rendement net avant dette = (recettes − charges − impôt) / prix global
+       * prix global = prix FAI + frais annexes d'acquisition (notaire, travaux, dossier, garantie, courtier) */
+      var fees_ = (p.fees || {});
+      var prixTotal = prix + (p.fraisNotaire || 0) + (p.travaux || 0) +
+        (fees_.dossier || 0) + (fees_.garantie || 0) + (fees_.courtier || 0);
+
       var rendementBrut = prix > 0 ? loyerPercu / prix : null;
-      var rendementNetAvantDette = (prix > 0 && n > 0)
+      var rendementNetAvantDette = (prixTotal > 0 && n > 0)
+        ? ((totalRecettes - totalCharges - totalImpot) / n) / prixTotal
+        : null;
+      var rendementNetPrixSeul = (prix > 0 && n > 0)
         ? ((totalRecettes - totalCharges - totalImpot) / n) / prix
         : null;
       var cashFlowMensuelMoyen = n > 0 ? totalCash / n / 12 : 0;
@@ -1481,6 +1491,8 @@
       return {
         rendementBrut: rendementBrut,
         rendementNetAvantDette: rendementNetAvantDette,
+        rendementNetPrixSeul: rendementNetPrixSeul,
+        prixTotalAcquisition: prixTotal,
         cashFlowMensuelMoyen: cashFlowMensuelMoyen,
         prixM2: prixM2,
         totalInterest: loanResult.totalInterest,
@@ -1488,6 +1500,7 @@
         totalLoanCost: loanResult.totalCost,
         totalCashFlow: totalCash,
         partLocataireAnnuelle: n > 0 ? yearly[0].recettes : 0,
+        partLocataireMensuelle: n > 0 ? yearly[0].recettes / 12 : 0,
         nYears: n
       };
     }
@@ -1551,9 +1564,15 @@
       '</div>';
   }
 
-  function renderCards(result) {
+  function renderCards(result, horizonOverride) {
     var lr = result.loan;
     var m = result.metrics;
+    /* V1.4 : reste à charge mensuel calculé sur l'horizon de revente (pas l'horizon 30 ans) */
+    var resaleRes = horizonOverride || result.resale;
+    var horizon = (resaleRes && resaleRes.holdingYears) ? resaleRes.holdingYears : m.nYears;
+    var totalCashHorizon = 0;
+    result.yearly.slice(0, horizon).forEach(function (y) { totalCashHorizon += y.cashFlow; });
+    var cf = horizon > 0 ? totalCashHorizon / horizon / 12 : 0;
 
     var cards = [];
     cards.push(card("Mensualité totale", formatXPF(lr.totalMonthly), "accent",
@@ -1561,18 +1580,19 @@
         ? "capital+intérêts " + formatXPF(lr.monthlyPayment) + " + assurance " + formatXPF(lr.insuranceMonthly)
         : "crédit non renseigné"));
 
-    cards.push(card("Part locataire / an", formatXPF(m.partLocataireAnnuelle), "",
-      "loyers + charges locatives, net de vacance (année 1)"));
+    cards.push(card("Part locataire / mois", formatXPF(m.partLocataireMensuelle), "",
+      "loyers + charges locatives, net de vacance (année 1) — annuel : " + formatXPF(m.partLocataireAnnuelle)));
 
-    var cf = m.cashFlowMensuelMoyen;
     cards.push(card("Reste à charge mensuel", formatXPF(cf), cf < 0 ? "negative" : "positive",
-      "cash-flow mensuel moyen sur " + m.nYears + " an" + (m.nYears > 1 ? "s" : "")));
+      "cash-flow mensuel moyen sur l'horizon de revente (" + horizon + " an" + (horizon > 1 ? "s" : "") + ")"));
 
     cards.push(card("Rendement brut", formatPct(m.rendementBrut), "",
       "loyer net de vacance / prix FAI"));
 
+    var feesX = (result.params.fees || {});
+    var prixTotalHint = formatXPF((result.params.priceFAI||0) + (result.params.fraisNotaire||0) + (result.params.travaux||0) + (feesX.dossier||0) + (feesX.garantie||0) + (feesX.courtier||0));
     cards.push(card("Rendement net avant dette", formatPct(m.rendementNetAvantDette), "",
-      "(recettes - charges - impôt) / prix FAI"));
+      "(recettes - charges - impôt) / prix total d'acquisition " + prixTotalHint + " (prix + notaire + travaux + frais) — sans frais annexes : " + formatPct(m.rendementNetPrixSeul)));
 
     cards.push(card("Prix au m\u00B2", m.prixM2 == null ? "\u2014" : formatXPF(m.prixM2) + "/m\u00B2", "",
       "prix FAI / surface habitable"));
@@ -1849,6 +1869,8 @@
     fiscal: fiscalModule,
     computeAll: computeAll,
     refresh: refresh,
+    renderCards: renderCards,
+    renderCardsHorizon: function (result3) { renderCards(result3, result3.resale); },
     renderTable: renderTable
   };
   window.RentaFisc = fiscalModule;
@@ -2284,6 +2306,8 @@
     renderScenarioCards(result);
     if (B2 && typeof B2.renderTable === "function") B2.renderTable(result);
     decorateTable(attrs(result));
+    /* V1.4 : re-rendre les cards bloc 2 avec l'horizon connu (reste à charge sur horizon de revente) */
+    if (B2 && typeof B2.renderCardsHorizon === "function") B2.renderCardsHorizon(result);
     return result;
   }
   /* le badge revente ne dépend pas des nouvelles colonnes : passe l'objet attendu */
