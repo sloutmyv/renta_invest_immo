@@ -1589,8 +1589,8 @@
     cards.push(card("Rendement brut", formatPct(m.rendementBrut), "",
       "loyer net de vacance / prix FAI"));
 
-    var feesX = (result.params.fees || {});
-    var prixTotalHint = formatXPF((result.params.priceFAI||0) + (result.params.fraisNotaire||0) + (result.params.travaux||0) + (feesX.dossier||0) + (feesX.garantie||0) + (feesX.courtier||0));
+    var _rp = (result.params || result.p || {}); var feesX = (_rp.fees || {});
+    var prixTotalHint = formatXPF((_rp.priceFAI||0) + (_rp.fraisNotaire||0) + (_rp.travaux||0) + (feesX.dossier||0) + (feesX.garantie||0) + (feesX.courtier||0));
     cards.push(card("Rendement net avant dette", formatPct(m.rendementNetAvantDette), "",
       "(recettes - charges - impôt) / prix total d'acquisition " + prixTotalHint + " (prix + notaire + travaux + frais) — sans frais annexes : " + formatPct(m.rendementNetPrixSeul)));
 
@@ -1870,7 +1870,10 @@
     computeAll: computeAll,
     refresh: refresh,
     renderCards: renderCards,
-    renderCardsHorizon: function (result3) { renderCards(result3, result3.resale); },
+    renderCardsHorizon: function (result3) {
+      if (!result3.metrics && result3.params) result3.metrics = metrics.build(result3.params, result3.loan, result3.yearly);
+      renderCards(result3, result3.resale);
+    },
     renderTable: renderTable
   };
   window.RentaFisc = fiscalModule;
@@ -1878,6 +1881,8 @@
 </script>
 
 <script>
+try {
+
 /* ================================================================
  * Renta Invest Immo — BLOC 3 : scénario de revente + TRI
  * ----------------------------------------------------------------
@@ -2200,7 +2205,8 @@
     var yearly = B2.revenue.build(p, loanResult);
     var resaleRes = resale.build(rp, p, loanResult, yearly);
     var triRes = tri.build(rp, p, loanResult, yearly, resaleRes);
-    return { p: p, rp: rp, loan: loanResult, yearly: yearly, resale: resaleRes, tri: triRes };
+    var metricsRes = B2.metrics.build(p, loanResult, yearly);
+    return { p: p, rp: rp, loan: loanResult, yearly: yearly, metrics: metricsRes, resale: resaleRes, tri: triRes };
   }
 
   function readResaleParams() {
@@ -2222,7 +2228,8 @@
     var rp = readResaleParams();
     var resaleRes = resale.build(rp, base.params, base.loan, base.yearly);
     var triRes = tri.build(rp, base.params, base.loan, base.yearly, resaleRes);
-    return { p: base.params, rp: rp, loan: base.loan, yearly: base.yearly, resale: resaleRes, tri: triRes };
+    var metricsRes = B2.metrics.build(base.params, base.loan, base.yearly);
+    return { p: base.params, rp: rp, loan: base.loan, yearly: base.yearly, metrics: metricsRes, resale: resaleRes, tri: triRes };
   }
 
   /* ================================================================
@@ -2410,6 +2417,9 @@
     refresh: refresh3
   };
 })();
+} catch (e) { window.__B3_ERR = e.message + "\n" + (e.stack||""); }
+</script>
+
 </script>
 
 <script>
